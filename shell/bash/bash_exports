@@ -1,0 +1,186 @@
+#!/bin/bash
+
+# bash_config
+
+## ENV
+export OSTYPE=`uname -s`
+export MTYPE=`uname -m`
+export VERSION=`uname -r`
+export ARCH_TYPE=${OSTYPE}_${MTYPE}
+export HOST=`hostname`
+
+# # Make vim the default editor
+# export EDITOR="vim"
+## Editor
+if which vim &> /dev/null; then
+  export EDITOR="vim"
+elif which vi &> /dev/null; then
+  export EDITOR="vi"
+fi
+
+# PATH Default
+PATH="/opt/local/bin:/opt/local/sbin:${PATH}";
+MANPATH="/opt/local/share/man:$MANPATH"
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+# Ignore duplicate commands in the history
+# Increase the maximum number of lines contained in the history file
+# (default is 500)
+export HISTCONTROL=ignoredups
+
+#export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
+# History ignore various commands
+export HISTIGNORE="&:c:p:x:h:r:.:..:...:cd*:lc*:cl*:ls*:ll:la:ld:l.:lab:dt:ds:dn:db:df:ps:exit:clear:history*:*--help:man *"
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+export HISTFILESIZE=10000
+
+# Increase the maximum number of commands to remember
+# (default is 500)
+export HISTSIZE=10000
+
+# Don't clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Export PhantomJS bin location (be explicit in case Homebrew is not installed
+# in the default location)
+# export PHANTOMJS_BIN="$(brew --prefix)/bin/phantomjs"
+
+# Make new shells get the history lines from all previous
+# shells instead of the default "last window closed" history
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
+# Bitbake Env settings
+# export BBPATH=/stuff/maemo-angstrom:/stuff/build:/stuff/openembedded
+# export PATH=/stuff/bitbake/bin:$PATH
+
+## Pager
+if [[ -x $( which less) ]]
+    export LESS='Ri'
+    export LESSCHARSET="utf-8"
+then
+    PAGER="less -FiRswXSM"
+    MANPAGER="less -FiRswXSM"
+    if [[ $terminfo[colors] -ge 8 ]]
+    then
+        # LESS man page colors (makes Man pages more readable).
+        export LESS_TERMCAP_mb=$'\E[01;31m'
+        export LESS_TERMCAP_md=$'\E[01;31m'
+        export LESS_TERMCAP_me=$'\E[0m'
+        export LESS_TERMCAP_se=$'\E[0m'
+        export LESS_TERMCAP_so=$'\E[01;44;33m'
+        export LESS_TERMCAP_ue=$'\E[0m'
+        export LESS_TERMCAP_us=$'\E[01;32m'
+    fi
+    # Less status line
+    # export LESS='-R -f -X -i -P ?f%f:(stdin). ?lb%lb?L/%L.. [?eEOF:?pb%pb\%..]'
+    export LESSCHARSET='utf-8'
+else
+    PAGER="more"
+    MANPAGER="$PAGER"
+fi
+
+export PAGER MANPAGER
+export VISUAL="${EDITOR}"
+export CVSEDITOR="${EDITOR}"
+export SVN_EDITOR="${EDITOR}"
+export GIT_EDITOR="${EDITOR}"
+# Version control software.
+export CVS_RSH="ssh"
+export RSYNC_RSH="ssh"
+
+## Colors
+# ls command colors
+# export LSCOLORS=exfxcxdxbxegedabagacad
+# export LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
+([[ -x $(which vimdiff) ]]   && export DIFFER="vimdiff")   || \
+([[ -x $(which colordiff) ]] && export DIFFER="colordiff") || \
+([[ -x $(which diff) ]]      && export DIFFER="diff")      || \
+echo "WARNING: You do not have any differ installed!"
+
+os_type=$(echo ${OSTYPE} | tr A-Z a-z)
+
+case ${os_type} in
+  darwin*)
+      export CM_CONF_LS_COLOR="-GF"
+      export CM_CONF_MORE_COLOR="-r"
+      export CM_CONF_LS_DIRGROUP=
+  ;;
+  linux*)
+      export CM_CONF_LS_COLOR="--color"
+      export CM_CONF_MORE_COLOR=
+      export CM_CONF_LS_DIRGROUP="--group-directories-first"
+  ;;
+  *)
+      export CM_CONF_LS_COLOR="--color"
+      export CM_CONF_MORE_COLOR=
+      export CM_CONF_LS_DIRGROUP="--group-directories-first"
+  ;;
+esac
+
+# OS-specific environment.
+case ${os_type} in
+  darwin*)
+    # Ignore reading of /etc/profile, which messes with $PATH. We re-enable
+    # reading other system-wide zsh files in ~/.zprofile. See
+    # http://www.zsh.org/mla/users/2015/msg00725.html for details.
+    setopt no_global_rcs
+    # Opt out of Homebrew analytics.
+    export HOMEBREW_NO_ANALYTICS=1
+    ## Set HOMEBREW Mirror
+    export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
+    ## add coreutils
+    if brew list | grep coreutils > /dev/null ; then
+      PATH="$(brew --prefix coreutils)/icu4c/bin:$(brew --prefix coreutils)/sbin:$PATH"
+    fi
+
+    if brew list | grep coreutils > /dev/null ; then
+      PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+      MANPATH="$(brew --prefix coreutils)/libexec/gnuman:${MANPATH}"
+      # alias ls='ls -F --show-control-chars --color=auto'
+      # eval `gdircolors -b $HOME/.dir_colors`
+    fi
+
+    # On OSX, we install zplug via Homebrew.
+    # export ZPLUG_HOME=/usr/local/opt/zplug
+
+    export ZPLUG_HOME=${HOME}/.zplug
+    ## Add Develop Environment
+    JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home"
+    ## upgrade use brew upgarde maven
+    M2_HOME=/usr/local/Cellar/maven/3.6.0
+    ## upgrade use brew upgarde leiningen
+    LEIN_HOME=/usr/local/Cellar/leiningen/2.8.3
+    ## M2_HOME=/Users/xiao/work/maven/apache-maven-3.6.0/
+
+    CLOJURE_HOME=/usr/local/Cellar/clojure/1.10.0.403
+    CLOJURE_JAR=/Users/xiao/.m2/repository/org/clojure/clojure/1.9.0/clojure-1.9.0.jar
+    PATH="${JAVA_HOME}/bin:${M2_HOME}/bin:${LEIN_HOME}/bin:${CLOJURE_HOME}/bin:${PATH}"
+    CLASSPATH=".:${JAVA_HOME}/lib/dt.jar:${JAVA_HOME}/lib/tools.jar:${LEIN_HOME}/libexec/leiningen-2.8.3-standalone.jar:${CLOJURE_JAR}:${CLOJURE_HOME}/libexec/clojure-tools-1.10.0.403.jar"
+    ## add mongodb
+    MONGODB_HOME=/usr/local/Cellar/mongodb/4.0.4_1
+    PATH="${MONGODB_HOME}/bin:${PATH}"
+    ;;
+esac
+
+export JAVA_HOME
+export M2_HOME
+export CLOJURE_HOME
+export LEIN_HOME
+export MONGODB_HOME
+export CLASSPATH
+export PATH
+
+# Locale
+# enable en_US locale w/ UTF-8 encodings if not already configured
+# Set UTF-8 locale.
+export LANG=en_US.UTF-8
+export LANGUAGE=en
+export LC_ALL="${LANG}"
+
+# Proxy settings
+#export http_proxy='127.0.0.1:5050'
+#export https_proxy='127.0.0.1:5050'
+#export ftp_proxy='127.0.0.1:5050'
+

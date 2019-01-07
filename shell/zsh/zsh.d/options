@@ -1,0 +1,111 @@
+#!/bin/zsh
+#
+# zsh specifics
+# http://zsh.sourceforge.net/Doc/Release/Options.html
+# =============================================================================
+#                                   Options
+# =============================================================================
+# -e：若指令传回值不等于0，则立即退出shell
+# set -e
+
+#TMOUT=60  # refresh prompt every minute (thus updating PS1 'hour' component)
+
+# Automagically quote URLs. This obviates the need to quote them manually when
+# pasting or typing URLs.
+# autoload -Uz url-quote-magic
+# zle -N self-insert url-quote-magic
+
+# autoload
+# Completion system
+# completion
+autoload -U compinit && compinit
+_comp_options+=(globdots) # auto-complete dot files
+
+## Correction
+setopt correctall
+
+## Prompt
+# prompt gentoo
+autoload -U promptinit
+promptinit
+
+## zstyle+
+autoload -U zstyle+
+
+## Initialize colors
+autoload -U colors && colors
+
+
+## predict
+# autoload predict-on
+# predict-on
+
+# 设置 walters 主题的默认命令行提示符
+#prompt walters
+
+## Help
+autoload -U run-help
+autoload run-help-git
+autoload run-help-svn
+autoload run-help-svk
+unalias run-help
+alias help=run-help
+
+autoload -U history-search-end
+
+## ssh-agent
+# eval "$(ssh-agent -s)"
+
+### Zsh Options ##########################################################
+#       See manual zshoptions(1).
+
+setopt  ALWAYS_TO_END         # cursor is moved to the end of the word
+setopt  APPEND_HISTORY        # zsh sessions will append their history list to the history file
+setopt  AUTO_CD               # 启用自动 cd，输入目录名回车进入目录#稍微有点混乱，不如 cd 补全实用
+setopt  AUTO_LIST             # 自动补全功能
+setopt  AUTO_MENU             # 开启此选项，补全时会直接选中菜单项 setopt MENU_COMPLETE
+#setopt AUTO_PUSHD            # 启用 cd 命令的历史纪录，cd -[TAB]进入历史路径
+# setopt  AUTO_RESUME           #
+# setopt  BANG_HIST             #
+setopt  CDABLE_VARS           #
+setopt  COMPLETE_IN_WORD      # #扩展路径 #/v/c/p/p => /var/cache/pacman/pkg
+setopt  CORRECT               #
+# setopt  completealiases
+# setopt  CORRECT_ALL           #
+# setopt  CSH_JUNKIE_HISTORY    #
+# setopt  EQUALS                #
+# setopt  EXTENDED_GLOB         #
+setopt  EXTENDED_HISTORY      # 为历史纪录中的命令添加时间戳
+setopt  FUNCTION_ARGZERO      #
+#setopt GLOB_COMPLETE         #
+# setopt  GLOB_DOTS             #
+
+setopt  HIST_IGNORE_DUPS      # 如果连续输入的命令相同，历史纪录中只保留一个
+setopt  HIST_IGNORE_ALL_DUPS  # don't record dupes in history
+setopt  HIST_REDUCE_BLANKS    #
+setopt  HIST_IGNORE_SPACE     # 在命令前添加空格，不将此命令添加到纪录文件中
+# setopt  HIST_SAVE_NO_DUPS     #
+# setopt  HIST_VERIFY           #
+setopt  INC_APPEND_HISTORY    # adds history incrementally and share it across sessions
+setopt  IGNORE_EOF            # avoid logout due to Ctrl-D
+setopt  INTERACTIVE_COMMENTS  # #允许在交互模式中使用注释  例如：#cmd #这是注释
+# setopt  LIST_PACKED           #
+# setopt  LONG_LIST_JOBS        #
+# setopt  MAGIC_EQUAL_SUBST     #
+setopt  NO_BG_NICE            # don't nice background tasks
+setopt  NO_CASE_GLOB          # Case insensitive globbing
+# setopt  NO_CLOBBER            #
+# setopt  NO_FLOW_CONTROL       #
+# setopt  NO_HUP                #
+# setopt  NO_LIST_BEEP          #
+# setopt  NOTIFY                #
+# setopt  NUMERIC_GLOB_SORT     #
+# setopt  PRINT_EIGHT_BIT       #
+# setopt  PROMPT_SUBST          #
+setopt  PUSHD_IGNORE_DUPS     # 相同的历史路径只保留一
+setopt  SHARE_HISTORY         # share history among zshs
+# setopt  SUN_KEYBOARD_HACK     #
+# setopt  ZLE                   #
+# unsetopt BG_NICE              #
+
+DISABLE_UNTRACKED_FILES_DIRTY="true" # makes repository status check for large repositories much faster

@@ -1,0 +1,254 @@
+#!/bin/zsh
+# -*- coding:utf-8 -*-
+# =============================================================================
+#                                   POWERLEVEL9K
+# =============================================================================
+# Font mode for powerlevel9k
+# POWERLEVEL9K_MODE='awesome-fontconfig'
+POWERLEVEL9K_MODE="nerdfont-complete"
+DEFAULT_USER=$USER
+
+#-------------------------------- Custom --------------------------------------#
+# POWERLEVEL9K_MODE="nerdfont-comple"
+# Please only use this battery segment if you have material icons in your nerd font (or font)
+# Otherwise, use the font awesome one in "User Segments"
+prompt_zsh_battery_level() {
+  local percentage1=`pmset -g ps  |  sed -n 's/.*[[:blank:]]+*\(.*%\).*/\1/p'`
+  local percentage=`echo "${percentage1//\%}"`
+  local color='%F{red}'
+  local symbol="\uf00d"
+  pmset -g ps | grep "discharging" > /dev/null
+  if [ $? -eq 0 ]; then
+    local charging="false";
+  else
+    local charging="true";
+  fi
+  if [ $percentage -le 20 ]
+  then symbol='\uf579' ; color='%F{red}' ;
+    #10%
+  elif [ $percentage -gt 19 ] && [ $percentage -le 30 ]
+  then symbol="\uf57a" ; color='%F{red}' ;
+    #20%
+  elif [ $percentage -gt 29 ] && [ $percentage -le 40 ]
+  then symbol="\uf57b" ; color='%F{yellow}' ;
+    #35%
+  elif [ $percentage -gt 39 ] && [ $percentage -le 50 ]
+  then symbol="\uf57c" ; color='%F{yellow}' ;
+    #45%
+  elif [ $percentage -gt 49 ] && [ $percentage -le 60 ]
+  then symbol="\uf57d" ; color='%F{blue}' ;
+    #55%
+  elif [ $percentage -gt 59 ] && [ $percentage -le 70 ]
+  then symbol="\uf57e" ; color='%F{blue}' ;
+    #65%
+  elif [ $percentage -gt 69 ] && [ $percentage -le 80 ]
+  then symbol="\uf57f" ; color='%F{blue}' ;
+    #75%
+  elif [ $percentage -gt 79 ] && [ $percentage -le 90 ]
+  then symbol="\uf580" ; color='%F{blue}' ;
+    #85%
+  elif [ $percentage -gt 89 ] && [ $percentage -le 99 ]
+  then symbol="\uf581" ; color='%F{blue}' ;
+    #85%
+  elif [ $percentage -gt 98 ]
+  then symbol="\uf578" ; color='%F{green}' ;
+    #100%
+  fi
+  if [ $charging = "true" ];
+  then color='%F{green}'; if [ $percentage -gt 98 ]; then symbol='\uf584'; fi
+  fi
+  echo -n "%{$color%}$symbol" ;
+}
+powerlevel9k_random_color(){
+  local code
+  #for code ({000..255}) echo -n "$%F{$code}"
+  #code=$[${RANDOM}%11+10]    # random between 10-20
+  code=$[${RANDOM}%211+20]    # random between 20-230
+  printf "%03d" $code
+}
+
+zsh_internet_signal(){
+  local color
+  local symbol="\uf7ba"
+  if ifconfig en0 | grep inactive &> /dev/null; then
+  color="%F{red}"
+  else
+  color="%F{blue}"
+  fi
+  echo -n "%{$color%}$symbol "
+}
+
+zsh_wifi_signal(){
+  local signal=$(nmcli -t device wifi | grep '^*' | awk -F':' '{print $6}')
+    local color="yellow"
+#     [[ $signal -gt 75 ]] && color='%F{green}'
+#     [[ $signal -lt 50 ]] && color='%F{red}'
+    [[ $signal -gt 75 ]] && color="green"
+    [[ $signal -lt 50 ]] && color="red"
+    echo -n "%F{$color}\uf1eb" # \uf1eb is 
+}
+
+## context
+## DEFAULT, ROOT, SUDO, REMOTE, REMOTE_SUDO
+
+# POWERLEVEL9K_CONTEXT_TEMPLATE="%n@`hostname -f`"
+# POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
+# POWERLEVEL9K_CUSTOM_WIFI_SIGNAL="zsh_wifi_signal"
+
+## HOST
+POWERLEVEL9K_HOST_LOCAL_BACKGROUND='clear'
+#POWERLEVEL9K_HOST_LOCAL_FOREGROUND='grey'
+POWERLEVEL9K_HOST_LOCAL_FOREGROUND='blue'
+POWERLEVEL9K_HOST_REMOTE_BACKGROUND='clear'
+#POWERLEVEL9K_HOST_REMOTE_FOREGROUND='magenta'
+POWERLEVEL9K_HOST_REMOTE_FOREGROUND='grey'
+POWERLEVEL9K_HOST_ICON="\uF109 " # 
+
+## SSH
+POWERLEVEL9K_SSH_ICON="\uF489 "  # 
+
+
+## OS
+# POWERLEVEL9K_OS_ICON_BACKGROUND='black'
+# POWERLEVEL9K_LINUX_ICON='%F{cyan} \uf303 %F{white} arch %F{cyan}linux%f'
+POWERLEVEL9K_OS_ICON_BACKGROUND="clear"
+POWERLEVEL9K_OS_ICON_FOREGROUND="grey"
+
+## USER
+POWERLEVEL9K_ROOT_ICON="\u26a1" # ⚡
+POWERLEVEL9K_USER_DEFAULT_BACKGROUND='clear'
+POWERLEVEL9K_USER_DEFAULT_FOREGROUND='cyan'
+POWERLEVEL9K_USER_ROOT_BACKGROUND='clear'
+POWERLEVEL9K_USER_ROOT_FOREGROUND='red'
+POWERLEVEL9K_USER_ICON='\ufb8a '
+##"\uf415" # 
+# P9K_USER_ICON="\uF415" # 
+#P9K_ROOT_ICON=$'\uFF03' # ＃
+# P9K_ROOT_ICON=$'\uF198'  # 
+
+## ROOT_INDICATOR
+POWERLEVEL9K_ROOT_INDICATOR_BACKGROUND="clear"
+POWERLEVEL9K_ROOT_INDICATOR_FOREGROUND="red"
+
+#POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+#POWERLEVEL9K_SHORTEN_DELIMITER=""
+#POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
+
+
+#POWERLEVEL9K_SHORTEN_DIR_LENGTH=3
+#POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
+
+## Separators
+POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=''
+POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=''
+POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR=''
+POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR=''
+
+## VCS colours
+POWERLEVEL9K_VCS_CLEAN_BACKGROUND="clear"
+POWERLEVEL9K_VCS_CLEAN_FOREGROUND="blue"
+POWERLEVEL9K_VCS_MODIFIED_BACKGROUND="clear"
+POWERLEVEL9K_VCS_MODIFIED_FOREGROUND="red"
+POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND="clear"
+POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND="green"
+
+
+## VCS icons
+# POWERLEVEL9K_VCS_UNTRACKED_ICON='\u25CF'
+# POWERLEVEL9K_VCS_UNSTAGED_ICON='\u00b1'
+# POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='\u2193'
+# POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='\u2191'
+# POWERLEVEL9K_VCS_COMMIT_ICON="\uf417"
+
+## Dir colours
+POWERLEVEL9K_DIR_PATH_SEPARATOR="%F{blue}/%F{blue}"
+
+POWERLEVEL9K_DIR_HOME_BACKGROUND="clear"
+POWERLEVEL9K_DIR_HOME_FOREGROUND="blue"
+POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND="clear"
+POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND="blue"
+POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_BACKGROUND="clear"
+POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_FOREGROUND="red"
+POWERLEVEL9K_DIR_DEFAULT_BACKGROUND="clear"
+POWERLEVEL9K_DIR_DEFAULT_FOREGROUND="cyan"
+# POWERLEVEL9K_DIR_DEFAULT_FOREGROUND="white"
+
+## STATUS
+
+POWERLEVEL9K_STATUS_VERBOSE=false
+POWERLEVEL9K_STATUS_OK=false
+# POWERLEVEL9K_OK_ICON=$'\uf164'
+# POWERLEVEL9K_FAIL_ICON=$'\uf165'
+POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE=true
+POWERLEVEL9K_STATUS_OK_BACKGROUND="clear"
+POWERLEVEL9K_STATUS_OK_FOREGROUND="green"
+POWERLEVEL9K_STATUS_ERROR_BACKGROUND="clear"
+POWERLEVEL9K_STATUS_ERROR_FOREGROUND="red"
+
+
+## RVM
+# POWERLEVEL9K_RVM_BACKGROUND="black"
+# POWERLEVEL9K_RVM_FOREGROUND="249"
+# POWERLEVEL9K_RVM_VISUAL_IDENTIFIER_COLOR="red"
+
+## TIME
+# POWERLEVEL9K_TIME_BACKGROUND="black"
+# POWERLEVEL9K_TIME_FOREGROUND="249"
+# POWERLEVEL9K_TIME_FORMAT="\UF43A %D{%I:%M  \UF133  %m.%d.%y}"
+
+POWERLEVEL9K_TIME_FORMAT="%D{\uf073 %b %d \uf017 %H:%M}" #  Jun 15  09:32
+POWERLEVEL9K_TIME_FOREGROUND="blue"
+POWERLEVEL9K_TIME_BACKGROUND="clear"
+POWERLEVEL9K_TIME_FOREGROUND="blue"
+
+## COMMAND_EXECUTION_TIME
+POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND='clear'
+POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND='magenta'
+POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=0
+
+## BACKGROUND_JOBS
+POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND='clear'
+POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND='magenta'
+
+## Battery
+## LOW, CHARGING, CHARGED, DISCONNECTED
+POWERLEVEL9K_BATTERY_ICON="\uf1e6"
+POWERLEVEL9K_BATTERY_LOW_BACKGROUND="clear"
+POWERLEVEL9K_BATTERY_CHARGING_BACKGROUND="clear"
+POWERLEVEL9K_BATTERY_CHARGED_BACKGROUND="clear"
+POWERLEVEL9K_BATTERY_DISCONNECTED_BACKGROUND="clear"
+
+POWERLEVEL9K_BATTERY_LOW_FOREGROUND="red"
+POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND="blue"
+POWERLEVEL9K_BATTERY_CHARGED_FOREGROUND="green"
+POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND="blue"
+POWERLEVEL9K_BATTERY_VERBOSE=true
+POWERLEVEL9K_BATTERY_LOW_THRESHOLD="10"
+
+## WIFI
+
+# POWERLEVEL9K_CUSTOM_WIFI_SIGNAL="echo signal: \$(nmcli device wifi | grep yes | awk '{print \$8}')"
+# POWERLEVEL9K_CUSTOM_WIFI_SIGNAL_BACKGROUND="blue"
+# POWERLEVEL9K_CUSTOM_WIFI_SIGNAL_FOREGROUND="yellow"
+
+## CUSTOM
+# POWERLEVEL9K_CUSTOM_BATTERY_STATUS="prompt_zsh_battery_level"
+# POWERLEVEL9K_CUSTOM_INTERNET_SIGNAL="zsh_internet_signal"
+
+## Prompt settings
+POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+POWERLEVEL9K_RPROMPT_ON_NEWLINE=true
+
+## MULITILINE PROMPT
+#POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{blue}\u256D\u2500%F{white}"
+#POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{blue}\u2570\uf460%F{white} "
+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{blue}\u256D\u2500%f"
+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{blue}\u2570\uf460%f "
+
+#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon custom_internet_signal battery root_indicator dir dir_writable_joined vcs)
+# POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir dir_writable_joined)
+# POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(command_execution_time vcs background_jobs_joined time_joined)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir vcs)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time time user_joined os_icon_joined host_joined)
+#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time vcs background_jobs_joined time_joined user_joined os_icon_joined host_joined)

@@ -1,0 +1,464 @@
+#!/bin/zsh
+# =============================================================================
+#                                   Aliases
+# =============================================================================
+
+# set -e
+
+
+# basics
+
+alias ag='ag --color-match "1;31"'
+
+if [[ `uname` == "Linux" ]];then
+  alias a='apt'
+  alias ai='apt install'
+  alias as='apt search'
+  alias ass='apt show'
+  alias au='apt update'
+  alias asu='apt safe-upgrade'
+
+  alias afu='apt-file update'
+  alias afs='apt-file search'
+  alias afsl='apt-file -l search'
+fi
+
+# base64 conversion
+alias base64-encode='perl -MMIME::Base64 -e "print encode_base64(<>)" <<<'
+alias base64-decode='perl -MMIME::Base64 -e "print decode_base64(<>)" <<<'
+
+alias -g      ...=../..
+alias -g     ....=../../..
+alias -g    .....=../../../..
+alias -g   ......=../../../../..
+alias -g  .......=../../../../../..
+alias -g ........=../../../../../../..
+
+alias cd..="cd .."
+alias cd...="cd ../.."
+alias cd....="cd ../../.."
+alias cd..='cd ../'                         # Go back 1 directory level (for fast typers)
+alias ..='cd ../'                           # Go back 1 directory level
+alias ...='cd ../../'                       # Go back 2 directory levels
+alias .3='cd ../../../'                     # Go back 3 directory levels
+alias .4='cd ../../../../'                  # Go back 4 directory levels
+alias .5='cd ../../../../../'               # Go back 5 directory levels
+alias .6='cd ../../../../../../'            # Go back 6 directory levels
+alias ~="cd ~"                              # ~:            Go Home
+alias c='clear'                             # c:            Clear terminal display
+alias cl="clear"
+alias cls='clear'
+alias cdc="cd; clear"
+
+# Shortcuts
+alias d="cd ~/Documents/Dropbox"
+alias df="df -h"
+
+alias dl="cd ~/Downloads"
+alias dt="cd ~/Desktop"
+alias dir='dir --color=auto'
+if which 'gdir' > /dev/null 2>&1; then
+    # gls provids by coreutils from macports
+  alias dir='gdir --color=auto'
+fi
+alias dh='df -h'
+alias dm='df -m'
+alias df='df -h'
+alias du='du -c -h'
+# alias diff='colordiff'              # requires colordiff package
+ [[ -x $(which colordiff) ]] && alias diff=colordiff
+
+alias cp='cp -iv'                           # Preferred 'cp' implementation
+alias mv='mv -iv'                           # Preferred 'mv' implementation
+alias rm='rm -iv'
+if which trash > /dev/null 2>&1; then
+  alias rm="trash"
+fi
+alias md="mkdir -p"
+alias mkdir='mkdir -pv'                     # Preferred 'mkdir' implementation
+alias rd="rmdir"
+
+alias less='less -FSRXc'                    # Preferred 'less' implementation
+# alias edit='subl'                           # edit:         Opens any file in sublime editor
+alias f='open -a Finder ./'                 # f:            Opens current directory in MacOS Finder
+
+alias p="cd ~/work/projects"
+
+alias whence='type -a'                        # where, of a sort
+
+# Swift editing and file display.
+alias e="$EDITOR"
+alias v="$VISUAL"
+
+#----------------------------------------------------------------------------#
+#                                 Colors
+#----------------------------------------------------------------------------#
+# # check is application exists via 'witch' utility
+# function provided_in_env()
+# {
+#     local bin=$1
+#     if which $bin > /dev/null 2>&1; then
+#       return 0
+#     else
+#       return 1
+#     fi
+# }
+# local dircolors_bin=""
+# for itr in 'dircolors' 'gdircolors'
+# do
+#   if (provided_in_env $itr); then
+#     dircolors_bin=$itr
+#     break
+#   fi
+# done
+
+
+# if [[ "$dircolors_bin" != "" ]]; then
+#     eval $($dircolors_bin ~/.zsh/dir_colors)
+# fi
+#
+
+# if ls --color > /dev/null 2>&1; then
+# if [[ ${PREFIX} == "darwin" ]];then ## macOS `ls`
+# 	colorflag="-G"
+# 	#export LSCOLORS='BxBxhxDxfxhxhxhxhxcxcx'
+#   #export LSCOLORS='gxfxcxdxbxegedabagacad'
+# else
+#   colorflag="--color" ## GNU `ls`
+#   export LS_COLORS='no=00:fi=00:di=01;31:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
+# fi
+
+# This one is to take care of make
+# Give me a nice, distinguishable make output
+alias make='clear && make'
+alias m='make'
+
+case `uname` in
+    Linux)
+        alias ls='ls -hF --color=auto' ;
+        alias lsd='ls -dAFh --color=auto .[^.]*'; # ls Dotfiles
+        alias lst='ls -hFtl --color=auto | grep $(date +%Y-%m-%d)' #ls Today
+        alias dir='ls --color=auto --format=vertical'
+        alias vdir='ls --color=auto --format=long'
+        alias grep='grep --color=auto'
+        alias fgrep='fgrep --color=auto'
+        alias egrep='egrep --color=auto'
+        alias ls='ls --color=auto'
+        alias dir='dir --color=auto'
+    ;;
+    Darwin|*BSD)
+        # Directory coloring
+        if which gls > /dev/null 2>&1; then
+          # Prefer GNU version, since it respects dircolors.
+          alias ls='gls --group-directories-first --color=auto'
+        else
+          alias ls='ls -hFG'
+        fi
+        alias l='ls -CFG'
+        alias la='ls -AG'
+        alias ls='ls -hFG'
+        alias lt="ls -lhtrF"
+        alias ll='ls -FGlAhp'                       # Preferred 'ls' implementation
+        alias lal='ls -alhG'
+        alias lsd='ls -dAFhG .[^.]*'; # ls Dotfiles
+        alias lst='ls -hFtlG | grep $(date +%Y-%m-%d)'
+    ;;
+esac
+
+        alias lad='ls -d .*(/)'                 # only show dot-directories
+        alias ldf='ls -a .*(.)'                 # only show dot-files
+        alias lss='ls -l *(s,S,t)'              # only files with setgid/setuid/sticky flag
+        alias lsl='ls -l *(@[1,10])'            # only symlinks
+        alias lsx='ls -l *(*[1,10])'            # only executables
+        alias lsw='ls -ld *(R,W,X.^ND/)'        # world-{readable,writable,executable} files
+        alias lsbig="ls -flh *(.OL[1,10])"      # display the biggest files
+#       alias lsd='ls -d *(/)'                  # only show directories
+        alias lse='ls -d *(/^F)'                # only show empty directories
+        alias lsnew="ls -rl *(D.om[1,10])"      # display the newest files
+        alias lsold="ls -rtlh *(D.om[1,10])"    # display the oldest files
+        alias lssmall="ls -Srl *(.oL[1,10])"    # display the smallest files
+# case `uname -s` in
+#   FreeBSD)
+#   export LC_ALL="en_US.UTF-8"
+#   export LANG="en_US.UTF-8"
+#   export LSCOLORS="exgxfxcxcxdxdxhbadacec"
+#   alias man="PAGER=\"col -b | vim -c 'set ft=man nomod nolist' -\" man"
+#   alias ls="ls -G"
+#   alias ll="ls -Glh"
+#   alias lla="ls -Glha"
+#   alias lll="ls -Glh | less"
+#   alias grep="grep --colour"
+#   alias cp='cp -v'
+#   alias mv='mv -v'
+#   alias rm='rm -v'
+#   kbdcontrol -b off
+#   ;;
+#   OpenBSD)
+#   export PKG_PATH="http://ftp.fr.openbsd.org/pub/OpenBSD/$(uname -r)/packages/$(uname -m)/"
+#   which colorls >/dev/null 2>&1 && alias ls="colorls -G"
+#   ;;
+#   Linux)
+#   if [[ -r ~/.dir_colors ]]; then
+#     eval `dircolors -b ~/.dir_colors`
+#   elif [[ -r /etc/DIR_COLORS ]]; then
+#     eval `dircolors -b /etc/DIR_COLORS`
+#   fi
+#   alias ls="ls --color=auto"
+#   alias ll='ls --color=auto -lh'
+#   alias lla='ls --color=auto -lha'
+#   alias lll='ls --color=auto -lh | less'
+#   alias vim='TERM=xterm-256color vim'
+#   which chg 2>/dev/null >/dev/null && alias hg=chg
+#   alias grep='grep --color=auto'
+#   export MANPAGER="/bin/sh -c \"sed -e 's/.$(echo -e '\010')//g' | vim -R -c 'set ft=man nomod nolist' -\""
+#   export PATH="$HOME/.local/bin:$NPM_PACKAGES/bin:$GOPATH/bin:$HOME/.pyenv/bin:$HOME/bin:/usr/lib/postgresql/9.6/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH"
+#   export PAGER='less -FRXS'
+#   alias cp='cp -v'
+#   alias mv='mv -v'
+#   alias rm='rm -v'
+#   ;;
+# esac
+
+# # move-rename w/o correction and always in interactive mode
+# alias mv='nocorrect mv -i'
+# # recursize copy w/o correction and always in interactive mode
+# alias cp='nocorrect cp -iR'
+# # remove w/o correction and always in interactive mode
+# alias rm='nocorrect rm -i'
+# # create direcotory w/o correction
+# alias mkdir='nocorrect mkdir'
+
+
+alias slink="link -s"
+alias ln="ln -s"
+
+# alias ssh="ssh -X"
+# alias s="ssh -X"
+
+
+# Always enable colored `grep` output
+# Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
+# Enable color support of ls and also add handy aliases
+if [[ -x /usr/bin/dircolors ]]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+else
+    # Generic command adaptations.
+    #alias grep='grep --color=auto'
+    alias grep='grep -E --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} --exclude="*.pyc"'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+
+fi
+
+
+alias javac="javac -J-Dfile.encoding=utf8"
+
+alias gz="tar -zxvf"
+# alias mvim='mvim -v'
+
+#alias h='fc -li 1000'
+alias h='history'
+alias help='man'
+
+# alias nano='nano -c'
+
+alias tailf='tail -f'
+
+if which vim &>/dev/null; then
+    alias vi='vim'
+fi
+
+# Get week number
+alias week='date +%V'
+
+# Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+# Homebrew
+alias brewu='brew update  && brew upgrade && brew cleanup && brew prune && brew doctor'
+
+# Google Chrome
+alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+alias canary='/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary'
+
+# IP addresses
+alias ip="dig +short 127.0.0.1"
+alias localip="ipconfig getifaddr en0"
+alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+
+# auto open images
+# alias -s {jpg,JPG,jpeg,JPEG,png,PNG,gif,GIF}="feh -FZd"
+
+# auto open movies
+# alias -s {mpg,mpeg,avi,ogm,wmv,m4v,mp4,mov}="mplayer -idx"
+
+# auto open audio
+# alias -s {mp3,ogg,wav,flac}="cplay"
+
+# auto open web addresses
+# alias -s {html,php,com,net,org,gov}="firefox"
+
+# auto open regular files
+# alias -s txt="vim"
+alias -s pdf="xpdf"
+
+# alias mysql='/usr/local/opt/mysql/bin/mysql'
+# alias mysqladmin='/usr/local/opt/mysql/bin/mysqladmin'
+
+alias hp="hexo clean && hexo g && hexo d"
+
+
+## Git Aliases
+
+alias g="git"
+alias ga='git add'
+alias gap='git add -p'
+#alias ga='git add -A'
+alias gbr='git branch'
+alias gbi='git rebase --interactive'
+
+alias gc="git commit -m"
+alias gco="git checkout"
+alias gcln='git clean'
+alias gclndf='git clean -df'
+alias gclndfx='git clean -dfx'
+
+alias gd='git diff'
+alias gdc='git diff --cached -w'
+alias gds='git diff --staged -w'
+alias gdmb='git branch --merged | grep -v "\*" | xargs -n 1 git branch -d'
+
+alias gf='git fetch'
+alias gfp='git fetch --prune'
+alias gfa='git fetch --all'
+alias gfap='git fetch --all --prune'
+alias gfch='git fetch'
+
+alias ggrc='git rebase --continue'
+
+alias gl="git log"
+alias gpl="git pull"
+alias gps="git push"
+alias gplr='git pull --rebase'
+alias gpub='grb publish'
+
+alias gm='git merge'
+alias gms='git merge --squash'
+alias gam='git amend --reset-author'
+
+alias gr='git rebase'
+alias gra='git rebase --abort'
+alias grv='git remote -v'
+alias grr='git remote rm'
+alias grad='git remote add'
+alias grs='git reset'
+alias grsh='git reset --hard'
+
+alias gs="git status"
+#alias gsm="git summary"
+alias gst='git stash'
+alias gsa='git stash apply'
+alias gsp='git stash pop'
+alias gsh='git show'
+alias gshw='git show'
+alias gshow='git show'
+
+alias gsm='git submodule'
+alias gsmi='git submodule init'
+alias gsmu='git submodule update'
+
+alias gitignore='vim .gitignore'
+
+alias guns='git unstage'
+alias gunc='git uncommit'
+
+alias go="git-open"
+
+alias trash="trash"
+
+# alias for proxy
+# alias proxy="export ALL_PROXY=socks5://127.0.0.1:7070"
+# alias unproxy="unset ALL_PROXY"
+# alias ip="curl ip.cn"
+
+alias emacs='emacsclient -a ""'
+alias e='emacsclient -nw -a ""'
+alias ekill='emacsclient -e "(kill-emacs)"'
+alias elcc='\emacs -batch -L ./ -f batch-byte-compile'
+
+## global pipe aliases
+alias -g A='|awk'
+alias -g B='|bat'
+alias -g C='|cat'
+alias -g G='|grep'
+alias -g H='|head'
+alias -g L='|less'
+alias -g S='|sed'
+alias -g T='|tail'
+alias -g M="| most" # << most is the best pager evar.
+alias -g E="| egrep"
+alias -g S="| sed -r -e"
+# alias -g XC="| xclip"
+# alias -g X="| xmessage -file -"
+# alias -g XO="| xmessage -button okay:0,cancel:1 -default okay -file -"
+# alias -g ZO="| zenity --text-info"
+
+#-----------------------
+# Global alias (for ZSH)
+# ----------------------
+if [[ -n ${ZSH_VERSION-} ]]; then
+    alias -g L="| less"             # Write L after a command to page through the output.
+    alias -g H="| head -n 20"       # Write H after a command to get the 20 first lines
+    alias -g G='| grep --color -i'  # Write G after the command to grep it
+    alias -g TL='| tail -20'
+    alias -g NUL="> /dev/null 2>&1" # You get the idea.
+fi
+
+alias s='source'
+alias x='exit'
+alias p='pushd'
+alias pp='popd'
+alias j='jobs'
+
+alias -s htm="$BROWSER"
+alias -s html="$BROWSER"
+alias -s jar="java -jar"
+alias -s war="java -jar"
+alias -s deb="sudo dpkg -i"
+alias -s gpg="gpg"
+# alias -s txt=lv
+# alias -s org=lv
+# alias -s c=lv
+# alias -s cc=lv
+# alias -s cpp=lv
+# alias -s h=lv
+# alias -s hpp=lv
+# alias -s v=lv
+# alias -s vh=lv
+# alias -s sv=lv
+# quick editor commands
+alias vimrc="$EDITOR ~/.vimrc"
+alias zshrc="$EDITOR ~/.zshrc"
+alias zshrc.staging="$EDITOR ~/.zshrc.staging"
+alias zshrc.local="$EDITOR ~/.zshrc.$HOST"
+
+# One of @janmoesen’s ProTip™s
+for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
+  alias "${method}"="lwp-request -m '${method}'"
+done
+
+# Airport CLI alias
+# alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport'
+
+# Reload the shell (i.e. invoke as a login shell)
+alias reload="exec ${SHELL} -l"
+
+# Print each PATH entry on a separate line
+alias path='echo -e ${PATH//:/\\n}'
+
+alias zshconfig="mate ~/.zshrc"
+alias ohmyzsh="mate ~/.oh-my-zsh"

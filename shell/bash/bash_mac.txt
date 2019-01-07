@@ -1,0 +1,94 @@
+# If we are not on Mac OS we exit
+[ "$(uname)" != "Darwin" ] && return;
+
+# MySQL
+export PATH="/usr/local/mysql/bin:$PATH"
+
+
+#--------------------------------------------------------------------------
+# APPLICATION ALIASES
+#--------------------------------------------------------------------------
+
+alias brave="open -a Brave"
+alias chrome="open -a Chrome"
+alias safari="open -a Safari"
+alias firefox="open -a Firefox"
+alias bbedit="open -a BBEdit"
+alias vsc="open -a Visual\ Studio\ Code"
+
+#--------------------------------------------------------------------------
+# EXPORTS
+#--------------------------------------------------------------------------
+
+export CLICOLOR=1
+export LS_COLORS=GxFxCxDxBxegedabagaced
+
+#--------------------------------------------------------------------------
+# FUNCTIONS
+#--------------------------------------------------------------------------
+
+# Reset the terminal
+function reload(){
+    reset
+    source ${HOME}/.bash_profile
+}
+
+# -----------------------------------------------------------------------------
+
+# Show/hide hidden files
+function togglehidden() {
+    ISHIDDEN=$(defaults read com.apple.finder AppleShowAllFiles)
+    if [ $ISHIDDEN == TRUE ]; then
+        defaults write com.apple.finder AppleShowAllFiles FALSE
+    else
+        defaults write com.apple.finder AppleShowAllFiles TRUE
+    fi
+    killall Finder
+}
+
+# -----------------------------------------------------------------------------
+
+# Creates an invisible doc spacer
+function dockspacer() {
+    defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'; killall Dock
+}
+
+#--------------------------------------------------------------------------
+
+# Change directories and list contents
+function lc() {
+    if ! [[ -z "$1" ]]; then
+        cd $1
+    fi 
+    ls -A
+}
+
+#--------------------------------------------------------------------------
+
+# Empty trash
+function emptytrash() {
+    rm -rf ~/.Trash/*
+    echo "Trash has been emptied."
+}
+
+#--------------------------------------------------------------------------
+
+# MySQL start
+function mysqlstart() {
+    sudo /usr/local/mysql/support-files/mysql.server start
+}
+
+#--------------------------------------------------------------------------
+
+# MySQL stop
+function mysqlstop() {
+    sudo /usr/local/mysql/support-files/mysql.server stop
+}
+
+#--------------------------------------------------------------------------
+
+# Create a spacer in the doc
+function mkdockspacer(){
+    defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
+    killall Dock
+}

@@ -1,0 +1,101 @@
+#!/bin/bash
+# To see current shell options settings type: shopt
+#
+# shopt -s option # sets an option
+# shopt -u option # unsets an option
+#
+# List of built-in options here:
+# https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+#
+# bash_exports
+
+
+# Settings only supported in Bash 4 and above.
+# Max OS uses version 3 due to licensing issues.
+# Use homebrew to install version 4
+if [ "${BASH_VERSION:0:1}" -ge 4 ]; then
+    # Automatically apply cd when a directory name is entered
+    shopt -s autocd
+fi
+
+# Autocorrect typos in path names when using `cd`
+shopt -s cdspell
+
+# Save multi-line commands in history as single line
+shopt -s cmdhist
+
+# Check the window size after each command and, if necessary, update the values
+# of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Append to the Bash history file, rather than overwriting it
+shopt -s histappend
+
+# Case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob
+
+# Included dot files in expansion
+shopt -s dotglob
+
+# Extended pattern matching
+shopt -s extglob
+
+# Epand aliases
+shopt -s expand_aliases
+
+# Highlight section titles in manual pages.
+export LESS_TERMCAP_md="${yellow}";
+
+# Don’t clear the screen after quitting a manual page.
+export MANPAGER='less -X';
+
+# Always enable colored `grep` output.
+export GREP_OPTIONS='--color=auto'
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+
+## git bash completion for aliases
+# To Setup:
+# 1) Save the .git-completion.bash file found here:
+#    https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
+# 2) Add the following lines to your .bash_profile, be sure to reload (for example: source ~/.bash_profile) for the changes to take effect:
+if [ -f ~/.bin/git-completion.bash ]; then
+  . ~/.bin/git-completion.bash
+
+  # Add git completion to the aliases: you must manually match each of your aliases to the respective function for the git command defined in git-completion.bash.
+  __git_complete g __git_main
+  __git_complete gc _git_checkout
+  __git_complete gnb _git_checkout
+  __git_complete gnewbranch _git_checkout
+  __git_complete gm _git_merge
+  __git_complete grmbranch _git_branch
+  __git_complete gr _git_rebase
+  __git_complete gl _git_log
+  __git_complete ga _git_add
+  __git_complete gd _git_diff
+  __git_complete gcom _git_commit
+  __git_complete gcomma _git_commit
+  __git_complete gcmr _git_ls_remote
+fi
+
+## Custom git prompt configuration https://github.com/magicmonty/bash-git-prompt
+  # Set config variables first
+  GIT_PROMPT_ONLY_IN_REPO=0
+
+  # GIT_PROMPT_FETCH_REMOTE_STATUS=0   # uncomment to avoid fetching remote status
+
+  # Lucas: change fetch interval to 60 minutes (default is 5)
+  GIT_PROMPT_FETCH_TIMEOUT=60
+
+  # as last entry source the gitprompt script
+  GIT_PROMPT_THEME=Lucas_bullettrain_tags # use custom .git-prompt-colors.sh
+  source ~/.bin/bash-git-prompt/gitprompt.sh

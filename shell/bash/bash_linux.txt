@@ -1,0 +1,220 @@
+# If we are on Mac OS we exit
+[ "$(uname)" == "Darwin" ] && return;
+
+#--------------------------------------------------------------------------
+
+# Launch neofetch
+neofetch
+
+#--------------------------------------------------------------------------
+
+# Open a file or URL with the system default application.
+# We suppress error messages so the terminal doesn't get polluted.
+alias open="xdg-open >/dev/null 2>&1"
+
+#add new fonts
+alias fcs='sudo fc-cache -fv'
+alias fcl='sudo fc-cache -fv ~/.fonts'
+
+# Colorize
+alias ls='ls --color=auto'
+alias dir='dir --color=auto'
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+# So I don't have to type sudo
+alias pacman='sudo pacman'
+
+# Update packages and relaunch Conky so the package indicated resets
+alias pacsyu='pacman -Syu; reconky'
+
+# Update the mirrorlist
+alias mirrors="sudo reflector --verbose --country 'United States' -l 20 -n 5 --sort rate --save /etc/pacman.d/mirrorlist"
+
+# -----------------------------------------------------------------------------
+
+# Reset the terminal
+function reload(){
+    reset
+    source ${HOME}/.bashrc
+}
+
+#--------------------------------------------------------------------------
+
+# Launch Visual Studio Code
+function vsc() {
+    nohup /opt/visual-studio-code/code >/dev/null 2>&1 &
+    disown
+}
+
+# Lunch Hyper
+function hyper() {
+    /usr/bin/hyper >/dev/null 2>&1 &
+    disown
+}
+
+# Lunch XFCE Terminal
+function terminal() {
+    xfce4-terminal >/dev/null 2>&1 &
+    disown
+}
+
+#--------------------------------------------------------------------------
+
+# Change directories and list contents
+function lc() {
+    if ! [[ -z "$1" ]]; then
+        cd $1
+    fi 
+    ls -A --color=auto
+}
+
+#--------------------------------------------------------------------------
+
+# Backup dotfiles
+function syncdotfiles() {
+    ${HOME}/CodeLab/Utilities/sync-dotfiles.sh
+}
+
+#--------------------------------------------------------------------------
+
+# Sync bashrc files to git
+function syncbashfiles() {
+    ${HOME}/CodeLab/Utilities/sync-bashfiles.sh
+}
+
+#--------------------------------------------------------------------------
+
+# Sync personal files to git
+function syncextras() {
+    ${HOME}/CodeLab/Utilities/sync-extras.sh
+}
+
+#--------------------------------------------------------------------------
+
+# Wifi/VPN connection utility
+function wifivpn() {
+    ${HOME}/CodeLab/WifiVPN/wifivpn.sh
+}
+
+#--------------------------------------------------------------------------
+
+# AURIC AUR Helper
+function auric() {
+    ${HOME}/CodeLab/AURIC/auric.sh $@
+}
+
+#--------------------------------------------------------------------------
+
+# Pacman Cheatsheet
+function pcheat() {
+    ${HOME}/CodeLab/Shell-Scripts/pcheat.sh $@
+}
+
+#--------------------------------------------------------------------------
+
+# ConkyMatic automatic conky color generator
+function conkymatic() {
+    ${HOME}/CodeLab/ConkyMatic/conkymatic.sh $@
+}
+
+#--------------------------------------------------------------------------
+
+# Kill and restart conky
+function reconky() {
+    pkill conky
+    conky 2>/dev/null
+}
+
+#--------------------------------------------------------------------------
+
+# Session commands
+function session() {
+    ${HOME}/CodeLab/Utilities/session.sh $@
+}
+
+#--------------------------------------------------------------------------
+
+# Enpass doesn't play nice with dark themes, so this tricks it into
+# using a light theme. This must be run after a theme change.
+function enpasstheme() {
+    ${HOME}/CodeLab/Utilities/update-enpass-theme.sh
+}
+
+#--------------------------------------------------------------------------
+
+# Set display resolution and position
+function setresboth() {
+    xrandr --output eDP1 --mode 1920x1080 --rate 60 --noprimary
+    xrandr --output DP1 --mode 2560x1440 --rate 60 --primary --left-of eDP1
+    reconky
+}
+
+function setresdell() {
+    xrandr --output eDP1 --mode 1920x1080 --rate 60 --primary
+    reconky
+}
+
+#--------------------------------------------------------------------------
+
+# This is used only when I log straight into a terminal to increase font size
+function bigfont() {
+    setfont ter-v32b
+}
+
+#--------------------------------------------------------------------------
+
+# Variety transport control
+# Next
+function vn() {
+    variety -n  >/dev/null 2>&1
+}
+# Previous
+function vp() {
+    variety -p  >/dev/null 2>&1
+}
+# Send to trash
+function vx() {
+    variety -t >/dev/null 2>&1
+}
+
+#--------------------------------------------------------------------------
+
+# Empty trash
+function emptytrash() {
+    rm -rf ~/.local/share/Trash/expunged/*
+    rm -rf ~/.local/share/Trash/files/*
+    rm -rf ~/.local/share/Trash/info/*
+    echo "Trash has been emptied."
+}
+
+#--------------------------------------------------------------------------
+
+# MySQL start
+function mysqlstart() {
+    sudo systemctl start mysqld
+}
+
+# MySQL stop
+function mysqlstop() {
+    sudo systemctl stop mysqld
+}
+
+function mysqlstatus() {
+    systemctl status mysqld
+}
+
+#--------------------------------------------------------------------------
+
+# Set Reminder.
+# Allows you to set a reminder via the terminal.
+# A dialog box will show when the timer ends.
+reminder() {
+    echo "How many minutes from now do you want the reminder?"
+    read _TIME
+    echo "What should the reminder message say?"
+    read _MSG
+    echo "Reminder set!"
+    sleep ${_TIME}m && zenity --info --text "${_MSG}" >/dev/null 2>&1
+}

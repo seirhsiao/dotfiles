@@ -1,0 +1,91 @@
+#!/bin/zsh
+# =============================================================================
+#                                Key Bindings
+# =============================================================================
+
+# bindkey -v
+# keybind - emacs like
+bindkey -e
+bindkey ' '    magic-space
+# Common CTRL bindings.
+bindkey '^@' set-mark-command
+bindkey "^a" beginning-of-line
+bindkey "^b" backward-word
+bindkey "^d" delete-char
+bindkey '^D' delete-char-or-list
+bindkey "^e" end-of-line
+bindkey "^f" forward-word
+bindkey '^g' end-of-buffer-or-history
+bindkey "^i" expand-or-complete-prefix
+bindkey '^n' down-line-or-search
+bindkey '^p' up-line-or-search
+bindkey "^k" kill-line
+bindkey '^o' accept-line-and-down-history
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey '^[n'  history-beginning-search-forward-end
+bindkey '^[P'  history-beginning-search-backward-end
+bindkey "^y" accept-and-hold
+bindkey "^w" backward-kill-word
+bindkey '^W' backward-delete-word
+bindkey "^u" backward-kill-line
+bindkey '^r'   history-incremental-search-backward
+bindkey "^R" history-incremental-pattern-search-backward
+bindkey "^F" history-incremental-pattern-search-forward
+bindkey '^t'   transpose-chars
+bindkey '^_'   undo
+bindkey '\e[A' history-beginning-search-backward
+bindkey '\e[B' history-beginning-search-forward
+
+# Do not require a space when attempting to tab-complete.
+bindkey "^i" expand-or-complete-prefix
+
+# Fixes for alt-backspace and arrows keys
+bindkey '^[^?' backward-kill-word
+bindkey "^[[1;5C" forward-word
+bindkey "^[[1;5D" backward-word
+#bindkey "^[[C" forward-word
+#bindkey "^[[D" backward-word
+
+# Our custom version of oh-my-zsh's globalias plugin. Unlike the OMZ version,
+# we do not use the `expand-word' widget and only expand a few whitelisted
+# aliases.
+# See https://github.com/robbyrussell/oh-my-zsh/issues/6123 for discussion.
+globalias() {
+  # FIXME: the whitelist pattern should technically only be computed once, but
+  # since it's cheap, we keep it local for now.
+  local -a whitelist candidates
+  whitelist=(ls git tmux)
+  local pattern="^(${(j:|:)whitelist})"
+  for k v in ${(kv)aliases}; do
+    # We have a candidate unless the alias is an alias that begins with itself,
+    # e.g., ls='ls --some-option'.
+    if [[ $v =~ $pattern && ! $v =~ ^$k ]]; then
+      candidates+=($k)
+    fi
+  done
+  if [[ $LBUFFER =~ "(^|[;|&])\s*(${(j:|:)candidates})\s*($|[;|&])" ]]; then
+    zle _expand_alias
+  fi
+  zle self-insert
+}
+zle -N globalias
+bindkey -M emacs ' ' globalias
+bindkey -M viins ' ' globalias
+bindkey -M isearch ' ' magic-space # normal space during searches
+
+## Emulate tcsh's backward-delete-word
+#tcsh-backward-kill-word () {
+#    local WORDCHARS="${WORDCHARS:s#/#}"
+#    zle backward-kill-word
+#}
+#zle -N tcsh-backward-kill-word
+
+# https://github.com/sickill/dotfiles/blob/master/.zsh.d/key-bindings.zsh
+tcsh-backward-word () {
+  local WORDCHARS="${WORDCHARS:s#./#}"
+  zle emacs-backward-word
+}
+zle -N tcsh-backward-word
+bindkey '\e[1;3D' tcsh-backward-word
+bindkey '\e^[[D' tcsh-backward-word # tmux

@@ -1,0 +1,126 @@
+#!/bin/zsh
+# -*- coding:utf-8 -*-
+################################################################################
+#                              _____    _
+#                             |__  /___| |__  _ __ ___
+#                              / // __| '_ \| '__/ __|
+#                              / /_\__ \ | | | | | (__
+#                             /____|___/_| |_|_|  \___|
+################################################################################
+# Resources:
+# - https://github.com/seirhsiao/zsh-config
+#
+# You SHOULD have made `~/.zshenv` a symbolic link pointing to
+# `$ZDOTDIR/.zshenv` as follow:
+#
+#           ln -s ./dotfiles/shell/zsh/.zshenv ~/.zshenv
+#
+# This ensure all expected environment variable (in particular the ones of
+# XDG Base Directory Specification (see https://specifications.freedesktop.org/basedir-spec/latest/)
+# are set
+################################################################################
+#============================================================================#
+#                            zsh confuguration
+# Created by Jianfang Xiao <xiaojianfang558@gmail.com>
+#============================================================================#
+# set -xe
+# [ -f ${HOME}.bash_profile ] && source ${HOME}/.bash_profile
+#
+# [[ -o login ]] && echo 'yes login' || echo 'no login'
+# [[ -o interactive ]] && echo 'yes interactive' || echo 'no interactive'
+
+# put you own local configs in ~/.zshrc.local
+[[ -f ${HOME}/.zshrc.local ]] && source ${HOME}/.zshrc.local
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+#----------------------------------------------------------------------------#
+#                             User enviroment settings
+#----------------------------------------------------------------------------#
+# Set the path of zsh configuration directory
+export DEFAULT_USER=`id -un`
+#DEFAULT_USER="user"
+TERM=xterm-256color
+# Source exports
+# have added to zshenv
+# [[ -f ${ZSH_HOME}/exports ]] && source ${ZSH_HOME}/exports
+
+#-----------------------------------------------------------------------------#
+#                           History AND OPTIONS(zsh mudules)
+#-----------------------------------------------------------------------------#
+# if [[ -e ${ZSH_HOME}/opts ]]; then
+#      source ${ZSH_HOME}/options
+# fi
+
+# =============================================================================
+#                                Key Bindings
+# =============================================================================
+# if [[ -e ${ZSH_HOME}/zle ]]; then
+#      source ${ZSH_HOME}/zle
+# fi
+
+#----------------------------------------------------------------------------#
+#                                 utily functions
+#----------------------------------------------------------------------------#
+# [[ -f ${ZSH_HOME}/functions ]] && source ${ZSH_HOME}/functions
+
+
+#----------------------------------------------------------------------------#
+#                                 Completions
+#----------------------------------------------------------------------------#
+
+# [[ -f ${ZSH_HOME}/zstyle ]] && source ${ZSH_HOME}/zstyle
+
+
+#----------------------------------------------------------------------------#
+#                                  Aliases
+#----------------------------------------------------------------------------#
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+alias loadrc="source $HOME/.zshrc"
+if [[ -e ${ZSH_HOME}/alias ]]; then
+     source ${ZSH_HOME}/alias
+fi
+
+#----------------------------------------------------------------------------#
+#                                  Secrets
+#----------------------------------------------------------------------------#
+if [[ -e ~/.secrets ]]; then
+  source ~/.secrets
+fi
+
+#----------------------------------------------------------------------------#
+#                                    THEMES
+#----------------------------------------------------------------------------#
+## Use for Zplug
+# if [[ -f "${ZPLUG_HOME}"/init.zsh ]]; then
+#   source ${HOME}/.zsh/zplug.zsh
+#   zplug load
+# fi
+
+## Use for Oh My Zsh
+# Load a configuration of oh-my-zsh
+ [[ -f $ZSH_HOME/oh-my-zsh.zshrc ]] && source $ZSH_HOME/oh-my-zsh.zshrc
+
+# if [[ ! $DOT_SHELL_ZSHRC -eq 1 ]]; then
+#   DOT_SHELL_ZSHRC=1
+# fi
+export SHELL=/bin/zsh
+
+
+## https://www.jianshu.com/p/2c1ac913d2cb
+if [ -n "$INSIDE_EMACS" ]; then
+    chpwd() { print -P "\033AnSiTc %d" }
+    print -P "\033AnSiTu %n"
+    print -P "\033AnSiTc %d"
+fi
+
+## autojump
+## [[ -s ${HOME}/.autojump/etc/profile.d/autojump.sh ]] && source ${HOME}/.autojump/etc/profile.d/autojump.sh
+
+## fzf
+[[ -f ${HOME}/.fzf.zsh ]] && source ${HOME}/.fzf.zsh

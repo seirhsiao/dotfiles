@@ -1,0 +1,79 @@
+#!/bin/zsh
+# set -e
+if [ "$TERM" = "linux" ]; then
+  echo -en "\e]P0111111" #black
+  echo -en "\e]P8505450" #darkgrey
+  echo -en "\e]P1bf7979" #darkred
+  echo -en "\e]P9f4a45f" #red
+  echo -en "\e]P297b26b" #darkgreen
+  echo -en "\e]PAc5f779" #green
+  echo -en "\e]P3cdcda1" #brown
+  echo -en "\e]PBffffaf" #yellow
+  echo -en "\e]P44a54a3" #darkblue
+  echo -en "\e]PC7d87a4" #blue
+  echo -en "\e]P59c3885" #darkmagenta
+  echo -en "\e]PDe628ba" #magenta
+  echo -en "\e]P688aadd" #darkcyan
+  echo -en "\e]PE99ccff" #cyan
+  echo -en "\e]P7ffffff" #lightgrey
+  echo -en "\e]PFdedede" #white
+  clear #for background artifacting
+fi
+
+# setup key accordingly
+[[ -n "${key[Home]}"    ]]  && bindkey  "${key[Home]}"    beginning-of-line
+[[ -n "${key[End]}"     ]]  && bindkey  "${key[End]}"     end-of-line
+[[ -n "${key[Insert]}"  ]]  && bindkey  "${key[Insert]}"  overwrite-mode
+[[ -n "${key[Delete]}"  ]]  && bindkey  "${key[Delete]}"  delete-char
+[[ -n "${key[Up]}"      ]]  && bindkey  "${key[Up]}"      up-line-or-history
+[[ -n "${key[Down]}"    ]]  && bindkey  "${key[Down]}"    down-line-or-history
+[[ -n "${key[Left]}"    ]]  && bindkey  "${key[Left]}"    backward-char
+[[ -n "${key[Right]}"   ]]  && bindkey  "${key[Right]}"   forward-char
+
+##zkdb stuff
+#autoload zkbd
+#function zkbd_file() {
+#    [[ -f ~/.zkbd/${TERM}-${VENDOR}-${OSTYPE} ]] && printf '%s' ~/".zkbd/${TERM}-${VENDOR}-${OSTYPE}" && return 0
+#    [[ -f ~/.zkbd/${TERM}-${DISPLAY}          ]] && printf '%s' ~/".zkbd/${TERM}-${DISPLAY}"          && return 0
+#    return 1
+#}
+#
+#[[ ! -d ~/.zkbd ]] && mkdir ~/.zkbd
+#keyfile=$(zkbd_file)
+#ret=$?
+#if [[ ${ret} -ne 0 ]]; then
+##    zkbd
+#    keyfile=$(zkbd_file)
+#    ret=$?
+#fi
+#if [[ ${ret} -eq 0 ]] ; then
+#    source "${keyfile}"
+#else
+#    printf 'Failed to setup keys using zkbd.\n'
+#fi
+#unfunction zkbd_file; unset keyfile ret
+
+os_type=$(echo ${OSTYPE} | tr A-Z a-z)
+
+case ${os_type} in
+  darwin*)
+      export CM_CONF_LS_COLOR="-GF"
+      export CM_CONF_MORE_COLOR="-r"
+      export CM_CONF_LS_DIRGROUP=
+  ;;
+  linux*)
+      export CM_CONF_LS_COLOR="--color"
+      export CM_CONF_MORE_COLOR=
+      export CM_CONF_LS_DIRGROUP="--group-directories-first"
+  ;;
+  *)
+      export CM_CONF_LS_COLOR="--color"
+      export CM_CONF_MORE_COLOR=
+      export CM_CONF_LS_DIRGROUP="--group-directories-first"
+  ;;
+esac
+
+# source ironport specifics
+if [[ -e ~/.zsh/ironport ]]; then
+   . ~/.zsh/ironport
+fi

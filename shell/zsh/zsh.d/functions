@@ -1,0 +1,981 @@
+#!/bin/zsh
+#
+# list contents of directory on every "cd"
+
+keizerdev() {
+  echo "
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmm=================================================mmmmmmmmmm
+mmmmmmmm/ $1                                               \mmmmmmmm
+mmmmmmmm\                                                  /mmmmmmmm
+mmmmmmmmm=================================================mmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmddddmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmdyydmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdyyyyyyyyyyyyymmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhhyyo++++++++++hhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmyysss/----------yyhmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmyyo::-----------yyhmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmyyo-------------yyhmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmoo+-------------ooymmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmm------------------+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhs-------------hhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmhss/-------+ssmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdddo//--://yddmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdhhdmm--+mmdhhmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhhhhddhyyyhddhhhhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhhhhdyoydsohdhhhhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhhhhdysydhohdhhhhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhhhhdyssyyohdhhhhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmhhhhhdddddddddhhhhdmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmooshhhhhyyhhhhhhooymmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmm::+hhyyyyyyyyyhh::ommmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmddhyyyyyddhyyyyydddmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdyyyyymmdyyyyymmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdyyyyymmdyyyyymmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdyyyyymmdyyyyymmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmdyyyyymmdyyyyymmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmm++/:::::mmh:::::++smmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmm::::::::mmh:::::::ommmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+}
+
+
+# File search functions
+fin() { find . -iname "*$1*" ${@:2} }
+rgrep() { grep "$1" ${@:2} -R . }
+
+mkcd() { mkdir -p "$@" && cd "$_"; }
+mcd() { mkdir -p "$@" && cd "$@" }
+# mcd () { mkdir -p "$1" && cd "$1"; }         # mcd:          Makes new Dir and jumps inside
+
+push() { pushd $1 > /dev/null 2>&1; dirs -v; }
+pop() { popd > /dev/null 2>&1; dirs -v }
+
+pasteinit() {
+  OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
+  zle -N self-insert url-quote-magic # I wonder if you'd need `.url-quote-magic`?
+}
+
+pastefinish() {
+  zle -N self-insert $OLD_SELF_INSERT
+}
+
+## need install fzf shell
+# fd - cd to selected directory
+fd() {
+  local dir
+
+  which fzf > /dev/null 2>&1
+  if [[ $? -eq 0 ]]; then
+    echo "not found command fzf"
+    return 1
+  else
+    dir=$(find ${1:-.} -path '*/\.*' -prune \
+                    -o -type d -print 2> /dev/null | fzf +m) &&
+    cd "$dir"
+    return $?
+  fi
+}
+# fh - search in your command history and execute selected command
+fh() {
+  eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
+}
+
+# ch - browse chrome history
+# ch() {
+#   local cols sep
+#   cols=$(( COLUMNS / 3 ))
+#   sep='{::}'
+
+#   cp -f ~/Library/Application\ Support/Google/Chrome/Profile\ 1/History /tmp/h
+
+#   sqlite3 -separator $sep /tmp/h \
+#     "select substr(title, 1, $cols), url
+#      from urls order by last_visit_time desc" |
+#   awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\x1b[m\n", $1, $2}' |
+#   fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
+# }
+
+# reload zshrc
+src() {
+  autoload -U zrecompile
+  [[ -f ~/.zshrc ]] && zrecompile -p ~/.zshrc
+	for i in "$(find ~/.zsh/ -type f)"; do
+		[[ -f $i ]] && zrecompile -p $i
+		[[ -f $i.zwc.old ]] && rm -f $i.zwc.old
+	done
+          [[ -f ~/.zcompdump ]] && zrecompile -p ~/.zcompdump
+          [[ -f ~/.zcompdump ]] && zrecompile -p ~/.zcompdump
+          [[ -f ~/.zshrc.zwc.old ]] && rm -f ~/.zshrc.zwc.old
+          [[ -f ~/.zcompdump.zwc.old ]] && rm -f ~/.zcompdump.zwc.old
+          source ~/.zshrc
+}
+
+emulate -L zsh
+trans() {
+    case "$1" in
+        [dD]*)
+            translate -l de-en $2
+            ;;
+        [eE]*)
+            translate -l de-en -i $2
+            ;;
+        [hH]|-help|-h|--help)
+            echo "Usage $0 [ dD | eE ]"
+            echo "      d : German -> English"
+            echo "      e : English -> German"
+            ;;
+        *)
+            translate -l de-en $2
+            translate -l de-en -i $2
+            ;;
+    esac
+}
+
+lsarchive() {
+    if [[ -f "$1" ]] {
+        case "$1" in
+            *.tar*|*.tbz|*.tgz)
+                tar -atf "$1" ;;
+            *.zip)
+                unzip -l "$1" ;;
+            *.rar)
+                unrar l "$1" ;;
+            *.deb)
+                dpkg-deb -c "$1" ;;
+            *)
+                echo "Usage:"
+                echo "lsarchive ARCHIVE [tar(possibly compressed), zip, rar, deb]"
+                ;;
+        esac
+    } else {
+        echo "'$1' is not a valid archive"
+    }
+}
+
+#Show space dir occupies
+dirspace() {
+    if [[ -n "$1" ]] {
+        for dir in "$@" ; do
+            if [[ -d "$dir" ]] {
+                ( cd $dir; echo "-<$dir>"; du -shx .; echo);
+            } else {
+                echo "Warning: $dir does not exist." >&2
+            }
+        done
+    } else {
+        for dir in $path; do
+            if [[ -d "$dir" ]] {
+                ( cd $dir; echo "-<$dir>"; du -shx .; echo);
+            } else {
+                echo "Warning: $dir does not exist." >&2
+            }
+        done
+    }
+}
+
+cl() { cd "$@" && ls -l }
+cls() { cd "$@" && ls }
+# cdl() { builtin cd "$@"; ls -l; }               # Always list directory contents upon 'cd'
+
+#   cdf:  'Cd's to frontmost window of MacOS Finder
+#   ------------------------------------------------------
+# cdf () {
+#     currFolderPath=$( /usr/bin/osascript &lt;&lt;"    EOT"
+#         tell application "Finder"
+#             try
+#         set currFolder to (folder of the front window as alias)
+#             on error
+#         set currFolder to (path to desktop folder as alias)
+#             end try
+#             POSIX path of currFolder
+#         end tell
+#     EOT
+#     )
+#     echo "cd to \"$currFolderPath\""
+#     cd "$currFolderPath"
+# }
+#
+dcp() {
+    if [[ -d $2 ]] {
+        mkdir -p $2 && cp $1 $2
+    } else {
+        mkdir -p dirname $2 && cp $1 $2
+    }
+}
+
+wiki() {
+    # see https://dgl.cx/2008/11/wpdns-pres/
+    dig +short txt $1.wp.dg.cx
+}
+
+# Remove latex files
+rml() {
+    if [[ $# -gt 0 ]] {
+        for d in "$@"; do
+            rm -r "$d"/(auto|_region_.tex|*.(aux|log|out))
+        done
+    } else {
+        d=$(pwd)
+        rm -r "$d"/(auto|_region_.tex|*.(aux|log|out))
+    }
+}
+
+encrypt() {
+    gpg -es -r $GPGKEY $1
+}
+
+decrypt() {
+    gpg -o ${1%.*} -d $1
+}
+
+nm-toggle() {
+    (nmcli nm enable | grep 'enabled' > /dev/null) && nmcli nm enable false || nmcli nm enable true
+}
+
+zipf () { zip -r "$1".zip "$1" ; }           # zipf:         To create a ZIP archive of a folder
+
+trash () { command mv "$@" ~/.Trash ; }      # trash:        Moves a file to the MacOS trash
+ql () { qlmanage -p "$*" >& /dev/null; }     # ql:           Opens any file in MacOS Quicklook Preview
+
+#   mans:   Search manpage given in agument '1' for term given in argument '2' (case insensitive)
+#           displays paginated result with colored search terms and two lines surrounding each hit.             Example: mans mplayer codec
+#   --------------------------------------------------------------------
+# mans () {
+#     man $1 | grep -iC2 --color=always $2 | less
+# }
+# Coloured man pages using less as pager
+man() {
+    env \
+        LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+        LESS_TERMCAP_md=$(printf "\e[1;31m") \
+        LESS_TERMCAP_me=$(printf "\e[0m") \
+        LESS_TERMCAP_se=$(printf "\e[0m") \
+        LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+        LESS_TERMCAP_ue=$(printf "\e[0m") \
+        LESS_TERMCAP_us=$(printf "\e[1;36m") \
+        man "$@"
+}
+#   showa: to remind yourself of an alias (given some part of it)
+#   ------------------------------------------------------------
+# showa () { /usr/bin/grep --color=always -i -a1 $@ ~/Library/init/bash/aliases.bash | grep -v '^\s*$' | less -FSRXc ; }
+
+#   extract:  Extract most know archives with one command
+#   ---------------------------------------------------------
+# intellegently extract archives based on extension.
+extract () {
+   file=$1
+   dir=$2
+   if [[ -n $dir ]]; then
+      mkdir -p $dir;
+      echo Extracting $1 into $2 ...
+   else
+      echo Extracting $1 ...
+   fi
+
+   if [[ ! -f $1 ]] ; then
+      echo "'$1' is not a valid file"
+   else
+      case $1 in
+         *.tar.bz2)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar xjvf $1 $dc"
+             echo $cmd
+             eval ${cmd}
+             ;;
+         *.tar.gz)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar xzvf $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.tar)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar vxf $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.tbz2)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar xjvf $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.tgz)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar xzf $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.bz2)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar jf $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.zip)
+             if [[ -n $dir ]]; then dc="-d $dir"; fi
+             cmd="unzip $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.gz)
+             if [[ -n $dir ]]; then dc="-C $dir"; fi
+             cmd="tar zf $1 $dc";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.7z)
+             #TODO dir
+             cmd="7z x -o$dir $1";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *.rar)
+             #TODO Dir
+             cmd="unrar x $1 $dir";
+             echo $cmd;
+             eval ${cmd}
+             ;;
+         *)
+            echo "'$1' cannot be extracted via extract()"
+            ;;
+         esac
+   fi
+}
+
+# ARCHIVE COMPRESS {{{
+compress() {
+  if [[ -n "$1" ]]; then
+    FILE=$1
+    case $FILE in
+    *.tar) shift && tar cf $FILE $* ;;
+    *.tar.bz2) shift && tar cjf $FILE $* ;;
+    *.tar.gz) shift && tar czf $FILE $* ;;
+    *.tgz) shift && tar czf $FILE $* ;;
+    *.zip) shift && zip $FILE $* ;;
+    *.rar) shift && rar $FILE $* ;;
+    esac
+  else
+    echo "usage: compress <foo.tar.gz> ./foo ./bar"
+  fi
+}
+#}}}
+# Make a directory and cd into it
+take () {
+  mkdir -p $1
+  cd $1
+}
+
+#   ii:  display useful host related informaton
+#   -------------------------------------------------------------------
+ii() {
+    echo -e "\nYou are logged on ${RED}$HOST"
+    echo -e "\nAdditionnal information:$NC " ; uname -a
+    echo -e "\n${RED}Users logged on:$NC " ; w -h
+    echo -e "\n${RED}Current date :$NC " ; date
+    echo -e "\n${RED}Machine stats :$NC " ; uptime
+    echo -e "\n${RED}Current network location :$NC " ; scselect
+    echo -e "\n${RED}Public facing IP Address :$NC " ;myip
+    #echo -e "\n${RED}DNS Configuration:$NC " ; scutil --dns
+    echo
+}
+
+httpHeaders () { /usr/bin/curl -I -L $@ ; }             # httpHeaders:      Grabs headers from web page
+
+#   httpDebug:  Download a web page and show info on what took time
+#   -------------------------------------------------------------------
+httpDebug () { /usr/bin/curl $@ -o /dev/null -w "dns: %{time_namelookup} connect: %{time_connect} pretransfer: %{time_pretransfer} starttransfer: %{time_starttransfer} total: %{time_total}\n" ; }
+
+#   my_ps: List processes owned by my user:
+#   ------------------------------------------------------------
+my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,start,time,bsdtime,command ; }
+
+#   ---------------------------
+#   4.  SEARCHING
+#   ---------------------------
+
+fd() { find . -type d -iname "*$1*";}
+ff () { find . -iname "$@" ; }      # ff:       Find file under the current directory
+ffs () { find . -name "$@"'*' ; }   # ffs:      Find file whose name starts with a given string
+ffe () { find . -name '*'"$@" ; }   # ffe:      Find file whose name ends with a given string
+ff() { find . -type f -iname "*$1*";}
+findtext() { find .  -iname "$1" | xargs grep -n "$2";}
+
+#   spotlight: Search for a file using MacOS Spotlight's metadata
+#   -----------------------------------------------------------
+spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
+
+#   ---------------------------
+#   5.  PROCESS MANAGEMENT
+#   ---------------------------
+
+#   findPid: find out the pid of a specified process
+#   -----------------------------------------------------
+#       Note that the command name can be specified via a regex
+#       E.g. findPid '/d$/' finds pids of all processes with names ending in 'd'
+#       Without the 'sudo' it will only find processes of the current user
+#   -----------------------------------------------------
+findPid () { lsof -t -c "$@" ; }
+
+# TRAPZERR() {
+# if [[ $? -gt 0 ]];then
+#      /Applications/iTerm.app/Contents/MacOS/iTerm2 --launch_shell
+# fi
+# }
+
+# Reset prompt every minute to update hour
+# TRAPALRM() {  # don't clear completion items on reset prompt
+#     if [ "$WIDGET" != "complete-word" ]; then
+#         zle reset-prompt
+#     fi
+# }
+
+
+# dirwatch() {
+#     inotifywait -m $1 -e create -e move -e delete |
+#         while read thepath action file; do
+#             echo "$action $file"
+#         done
+# }
+
+where() {
+    find . -name \*$1\*
+}
+
+
+# Utility that prints out lines that are common among $# files.
+intersect() {
+  local sort='sort -S 1G'
+  case $# in
+    (0) true;;
+    (2) $sort -u "$1"; $sort -u "$2";;
+    (*) $sort -u "$1"; shift; intersection "$@";;
+  esac | $sort | uniq -d
+}
+
+# Changes an iTerm profile by sending a proprietary escape code that iTerm
+# intercepts. This function additionally updates ITERM_PROFILE environment
+# variable.
+iterm-profile() {
+  echo -ne "\033]50;SetProfile=$1\a"
+  export ITERM_PROFILE="$1"
+}
+
+# Convenience function to update system applications and user packages.
+# update() {
+#   # sudoe once
+#   if ! sudo -n true 2> /dev/null; then
+#     sudo -v
+#     while true; do
+#       sudo -n true
+#       sleep 60
+#       kill -0 "$$" || exit
+#     done 2>/dev/null &
+#   fi
+#   # System
+#   sudo softwareupdate -i -a
+#   # Homebrew
+#   brew upgrade
+#   brew cleanup
+#   # Ruby
+#   gem update --system
+#   gem update
+#   gem cleanup
+#   # npm
+#   npm install npm -g
+#   npm update -g
+#   # Shell plugin management
+#   zplug update
+#   tmux/plugins/tpm/bin/update_plugins all
+#   vim +PlugUpgrade +PlugUpdate +PlugCLean! +qa
+# }
+
+
+# =============================================================================
+#                                   Startup
+# =============================================================================
+
+# Load SSH and GPG agents via keychain.
+setup_agents() {
+  if [[ $UID -eq 0 ]]; then
+    return
+  fi
+  local -a ssh_keys gpg_keys
+  ssh_keys=(~/.ssh/**/*pub(.N:r))
+  gpg_keys=$(gpg -K --with-colons 2>/dev/null \
+               | awk -F : '$1 == "sec" { print $5 }')
+  if which keychain > /dev/null 2>&1; then
+    if (( $#ssh_keys > 0 )) || (( $#gpg_keys > 0 )); then
+      eval $(keychain -q --nogui --eval --host fix \
+        --agents ssh,gpg $ssh_keys ${(f)gpg_keys})
+    fi
+  fi
+}
+setup_agents
+unfunction setup_agents
+
+# web_search from terminal
+# function web_search() {
+#   emulate -L zsh
+
+#   # define search engine URLS
+#   typeset -A urls
+#   urls=(
+#     google      "https://www.google.com/search?q="
+#     ddg         "https://www.duckduckgo.com/?q="
+#     github      "https://github.com/search?q="
+#   )
+
+#   # check whether the search engine is supported
+#   if [[ -z "$urls[$1]" ]]; then
+#     echo "Search engine $1 not supported."
+#     return 1
+#   fi
+
+#   # search or go to main page depending on number of arguments passed
+#   if [[ $# -gt 1 ]]; then
+#     # build search url:
+#     # join arguments passed with '+', then append to search engine URL
+#     url="${urls[$1]}${(j:+:)@[2,-1]}"
+#   else
+#     # build main page url:
+#     # split by '/', then rejoin protocol (1) and domain (2) parts with '//'
+#     url="${(j://:)${(s:/:)urls[$1]}[1,2]}"
+#   fi
+
+#   open_command "$url"
+# }
+
+#use generalized open command
+# function open_command() {
+#   emulate -L zsh
+#   setopt shwordsplit
+
+#   local open_cmd
+
+#   # define the open command
+#   case "$OSTYPE" in
+#     darwin*)  open_cmd='open' ;;
+#     cygwin*)  open_cmd='cygstart' ;;
+#     linux*)   open_cmd='xdg-open' ;;
+#     msys*)    open_cmd='start ""' ;;
+#     *)        echo "Platform $OSTYPE not supported"
+#               return 1
+#               ;;
+#   esac
+
+#   # don't use nohup on OSX
+#   if [[ "$OSTYPE" == darwin* ]]; then
+#     $open_cmd "$@" &>/dev/null
+#   else
+#     nohup $open_cmd "$@" &>/dev/null
+#   fi
+# }
+
+# Show dots while waiting for tab-completion
+expand-or-complete-with-dots() {
+  # toggle line-wrapping off and back on again
+  [[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti rmam
+  print -Pn "%{%F{red}......%f%}"
+  [[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti smam
+
+  zle expand-or-complete
+  zle redisplay
+}
+
+# FUNCTIONS {{{
+# BETTER GIT COMMANDS {{{
+bit() {
+  # By helmuthdu
+    usage(){
+        echo "Usage: $0 [options]"
+        echo "  --init                                              # Autoconfigure git options"
+        echo "  a, [add] <files> [--all]                            # Add git files"
+        echo "  c, [commit] <text> [--undo]                         # Add git files"
+        echo "  C, [cherry-pick] <number> <url> [branch]            # Cherry-pick commit"
+        echo "  b, [branch] feature|hotfix|<name>                   # Add/Change Branch"
+        echo "  d, [delete] <branch>                                # Delete Branch"
+        echo "  l, [log]                                            # Display Log"
+        echo "  m, [merge] feature|hotfix|<name> <commit>|<version> # Merge branches"
+        echo "  p, [push] <branch>                                  # Push files"
+        echo "  P, [pull] <branch> [--foce]                         # Pull files"
+        echo "  r, [release]                                        # Merge unstable branch on master"
+        return 1
+      }
+      case $1 in
+        --init)
+          local NAME=`git config --global user.name`
+          local EMAIL=`git config --global user.email`
+          local USER=`git config --global github.user`
+          local EDITOR=`git config --global core.editor`
+
+          [[ -z $NAME ]] && read -p "Name: " NAME
+          [[ -z $EMAIL ]] && read -p "Email: " EMAIL
+          [[ -z $USER ]] && read -p "Username: " USER
+          [[ -z $EDITOR ]] && read -p "Editor: " EDITOR
+
+          git config --global user.name $NAME
+          git config --global user.email $EMAIL
+          git config --global github.user $USER
+          git config --global color.ui true
+          git config --global color.status auto
+          git config --global color.branch auto
+          git config --global color.diff auto
+          git config --global diff.color true
+          git config --global core.filemode true
+          git config --global push.default matching
+          git config --global core.editor $EDITOR
+          git config --global format.signoff true
+          git config --global alias.reset 'reset --soft HEAD^'
+          git config --global alias.graph 'log --graph --oneline --decorate'
+          git config --global alias.compare 'difftool --dir-diff HEAD^ HEAD'
+          if which meld &>/dev/null; then
+            git config --global diff.guitool meld
+            git config --global merge.tool meld
+          elif which kdiff3 &>/dev/null; then
+            git config --global diff.guitool kdiff3
+            git config --global merge.tool kdiff3
+          fi
+          git config --global --list
+          ;;
+        a | add)
+          if [[ $2 == --all ]]; then
+            git add -A
+          else
+            git add $2
+          fi
+          ;;
+        b | branch )
+          check_branch=`git branch | grep $2`
+          case $2 in
+            feature)
+              check_unstable_branch=`git branch | grep unstable`
+              if [[ -z $check_unstable_branch ]]; then
+                echo "creating unstable branch..."
+                git branch unstable
+                git push origin unstable
+              fi
+              git checkout -b feature --track origin/unstable
+              ;;
+            hotfix)
+              git checkout -b hotfix master
+              ;;
+            master)
+              git checkout master
+              ;;
+            *)
+              check_branch=`git branch | grep $2`
+              if [[ -z $check_unstable_branch ]]; then
+                echo "creating $2 branch..."
+                git branch $2
+                git push origin $2
+              fi
+              git checkout $2
+              ;;
+          esac
+          ;;
+        c | commit )
+          if [[ $2 == --undo ]]; then
+            git reset --soft HEAD^
+          else
+            git commit -am "$2"
+          fi
+          ;;
+        C | cherry-pick )
+          git checkout -b patch master
+          git pull $2 $3
+          git checkout master
+          git cherry-pick $1
+          git log
+          git branch -D patch
+          ;;
+        d | delete)
+          check_branch=`git branch | grep $2`
+          if [[ -z $check_branch ]]; then
+            echo "No branch founded."
+          else
+            git branch -D $2
+            git push origin --delete $2
+          fi
+          ;;
+        l | log )
+          git log --graph --oneline --decorate
+          ;;
+        m | merge )
+          check_branch=`git branch | grep $2`
+          case $2 in
+            --fix)
+              git mergetool
+              ;;
+            feature)
+              if [[ -n $check_branch ]]; then
+                git checkout unstable
+                git difftool -g -d unstable..feature
+                git merge --no-ff feature
+                git branch -d feature
+                git commit -am "${3}"
+              else
+                echo "No unstable branch founded."
+              fi
+              ;;
+            hotfix)
+              if [[ -n $check_branch ]]; then
+                # get upstream branch
+                git checkout -b unstable origin
+                git merge --no-ff hotfix
+                git commit -am "hotfix: v${3}"
+                # get master branch
+                git checkout -b master origin
+                git merge hotfix
+                git commit -am "Hotfix: v${3}"
+                git branch -d hotfix
+                git tag -a $3 -m "Release: v${3}"
+                git push --tags
+              else
+                echo "No hotfix branch founded."
+              fi
+              ;;
+            *)
+              if [[ -n $check_branch ]]; then
+                git checkout -b master origin
+                git difftool -g -d master..$2
+                git merge --no-ff $2
+                git branch -d $2
+                git commit -am "${3}"
+              else
+                echo "No unstable branch founded."
+              fi
+              ;;
+          esac
+          ;;
+        p | push )
+          git push origin $2
+          ;;
+        P | pull )
+          if [[ $2 == --force ]]; then
+            git fetch --all
+            git reset --hard origin/master
+          else
+            git pull origin $2
+          fi
+          ;;
+        r | release )
+          git checkout origin/master
+          git merge --no-ff origin/unstable
+          git branch -d unstable
+          git tag -a $2 -m "Release: v${2}"
+          git push --tags
+          ;;
+        *)
+          usage
+      esac
+    }
+  #}}}
+
+# TOP 10 COMMANDS {{{
+  # copyright 2007 - 2010 Christopher Bratusek
+  top10() { history | awk '{a[$2]++ } END{for(i in a){print a[i] " " i}}' | sort -rn | head; }
+#}}}
+# UP {{{
+# Goes up many dirs as the number passed as argument, if none goes up by 1 by default
+up() {
+  local d=""
+  limit=$1
+  for ((i=1 ; i <= limit ; i++)); do
+    d=$d/..
+  done
+  d=$(echo $d | sed 's/^\///')
+  if [[ -z "$d" ]]; then
+    d=..
+  fi
+  cd $d
+ }
+# ssh() {
+#   /usr/bin/ssh -t "$@" tmux new-session -A -s fabrice-session
+# }
+
+# psql_history() {
+#     psql -U postgres -c "SELECT (pg_stat_file('base/'||oid ||'/PG_VERSION')).modification, datname FROM pg_database;"
+# }
+
+# list contents of directory on every "cd"
+# function chpwd
+# {
+#   integer ls_lines="$(ls -C | wc -l)"
+#   if [[ $ls_lines -eq 0 ]]; then
+#     echo No files found: Empty Directory
+#   else
+#     ls -hl $CM_CONF_LS_DIRGROUP $CM_CONF_LS_COLOR | more $CM_CONF_MORE_COLOR
+#     echo "\e[1;32m --[\e[1;34m Dirs:\e[1;36m `ls -l | egrep \"^drw\" | wc -l` \e[1;32m|\e[1;35m Files: \e[1;31m`ls -l | egrep -v \"^drw\" | grep -v total | wc -l` \e[1;32m]--"
+#   fi
+# # source and create project environment
+#   if [[ -f $PWD/.projectenv ]]; then
+#     . $PWD/.projectenv
+#   fi
+# }
+
+# reload zshrc
+# function src()
+# {
+#         autoload -U zrecompile
+#                 [[ -f ~/.zshrc ]] && zrecompile -p ~/.zshrc
+#         for i in "$(find ~/.zsh/ -type f)"; do
+#           [[ -f $i ]] && zrecompile -p $i
+#           [[ -f $i.zwc.old ]] && rm -f $i.zwc.old
+#         done
+#                 [[ -f ~/.zcompdump ]] && zrecompile -p ~/.zcompdump
+#                 [[ -f ~/.zcompdump ]] && zrecompile -p ~/.zcompdump
+#                 [[ -f ~/.zshrc.zwc.old ]] && rm -f ~/.zshrc.zwc.old
+#                 [[ -f ~/.zcompdump.zwc.old ]] && rm -f ~/.zcompdump.zwc.old
+#                 source ~/.zshrc
+# }
+
+# function pic2gif {
+
+# }
+
+# hg rcs functions
+# function hgs() { hg status $* }
+# function hgl() { hg log $* }
+# function hgc() { hg commit -m "$*" }
+# function hgp() { hg push $* }
+# function hga() { hg add $* }
+
+# burn m3u
+# function burnm3u()
+# {
+#    dos2unix "$1"
+#    sed '/^#/d' "$1" | tr '\n' '\0' | xargs -0 k3b --datacd
+# }
+
+# To be used like foldl latex *.tex
+# function mapL {
+#     emulate -L zsh
+#     for i in ${~argv[2,-1]} ; do
+#         eval "${argv[1]} ${i}"
+#     done
+# }
+# alias map="noglob mapL"
+
+
+
+# To be used like foldr /etc/init.d/{foo,bar,baz} restart
+# function mapR {
+#     emulate -L zsh
+#     for i in ${~argv[1,-2]} ; do
+#         $i ${argv[-1]}
+#     done
+# }
+# alias mapr="noglob mapR"
+
+# Found in the mailinglistarchive from Zsh (IIRC ~1996)
+# MISC: Search in the $HISTFILE and select result to execute
+# function selhist()
+# {
+#   emulate -L zsh
+#   local TAB=$'\t';
+#   (( $# < 1 )) && {
+#     echo "Usage: $0 command"
+#     return 1
+#   };
+#   cmd=(${(f)"$(grep -w $1 $HISTFILE | sort | uniq | pr -tn)"})
+#   print -l $cmd | less -F
+#   echo -n "enter number of desired command [1 - $(( ${#cmd[@]} - 1 ))]: "
+#   local answer
+#   read answer
+#   print -z "${cmd[$answer]#*$TAB}"
+# }
+
+# query extended file attributes
+# fattr() {
+#   local val=$(getfattr -n user.$1 --only-values $REPLY 2>/dev/null)
+#   [[ -n $val && (( -z $2 || $val = $~2 )) ]]
+# }
+
+# SEARCH: summarized google, ggogle, mggogle, agoogle and fm
+# function search()
+# {
+#   case "$1" in
+#     -g) ${BROWSER:-lynx} http://www.google.com/search\?q=$2
+#     ;;
+#     -u) ${BROWSER:-lynx} http://groups.google.com/groups\?q=$2
+#     ;;
+#     -m) ${BROWSER:-lynx} http://groups.google.com/groups\?selm=$2
+#     ;;
+#     -a) ${BROWSER:-lynx} http://groups.google.com/groups\?as_uauthors=$2
+#     ;;
+#     -c) ${BROWSER:-lynx} http://search.cpan.org/search\?query=$2\&mode=module
+#     ;;
+#     -f) ${BROWSER:-lynx} http://freshmeat.net/search/\?q=$2\&section=projects
+#     ;;
+#     -F) ${BROWSER:-lynx} http://www.filewatcher.com/\?q=$2
+#     ;;
+#     -G) ${BROWSER:-lynx} http://www.rommel.stw.uni-erlangen.de/~fejf/cgi-bin/pfs-web.pl\?filter-search_file=$2
+#     ;;
+#     -s) ${BROWSER:-lynx} http://sourceforge.net/search/\?type=soft\&q=$2
+#     ;;
+#     -w) ${BROWSER:-lynx} http://de.wikipedia.org/wiki/$2
+#     ;;
+#     -W) ${BROWSER:-lynx} http://en.wikipedia.org/wiki/$2
+#     ;;
+#     -d) lynx -source "http://dict.leo.org?$2" | grep -i "TABLE.*/TABLE" | sed "s/^.*\(<TABLE.*TABLE>\).*$/<HTML><BODY>\1<\/BODY><\/HTML>/" | lynx -stdin -dump -width=$COLUMNS -nolist;
+#     ;;
+#     *)
+#       echo "Usage: $0 {-g | -u | -m | -a | -f | -c | -F | -s | -w | -W | -d}"
+#       echo "  -g:  Searching for keyword in google.com"
+#       echo "  -u:  Searching for keyword in groups.google.com"
+#       echo "  -m:  Searching for message-id in groups.google.com"
+#       echo "  -a:  Searching for Authors in groups.google.com"
+#       echo "  -c:  Searching for Modules on cpan.org."
+#       echo "  -f:  Searching for projects on Freshmeat."
+#       echo "  -F:  Searching for packages on FileWatcher."
+#       echo "  -G:  Gentoo file search."
+#       echo "  -s:  Searching for software on Sourceforge."
+#       echo "  -w:  Searching for keyword at wikipedia (german)."
+#       echo "  -W:  Searching for keyword at wikipedia (english)."
+#       echo "  -d:  Query dict.leo.org ;)"
+#   esac
+# }
+
+# extract_archive () {
+#     local old_dirs current_dirs lower
+#     lower=${(L)1}
+#     old_dirs=( *(N/) )
+#     if [[ $lower == *.tar.gz || $lower == *.tgz ]]; then
+#         tar xvzf $1
+#     elif [[ $lower == *.gz ]]; then
+#         gunzip $1
+#     elif [[ $lower == *.tar.bz2 || $lower == *.tbz ]]; then
+#         tar xvjf $1
+#     elif [[ $lower == *.tar.xz || $lower == *.txz ]]; then
+#   tar xvJf $1
+#     elif [[ $lower == *.bz2 ]]; then
+#         bunzip2 $1
+#     elif [[ $lower == *.zip ]]; then
+#         unzip $1
+#     elif [[ $lower == *.rar ]]; then
+#         unrar e $1
+#     elif [[ $lower == *.tar ]]; then
+#         tar xvf $1
+#     elif [[ $lower == *.lha ]]; then
+#         lha e $1
+#     else
+#         print "Unknown archive type: $1"
+#         return 1
+#     fi
+#     # Change in to the newly created directory, and
+#     # list the directory contents, if there is one.
+#     current_dirs=( *(N/) )
+#     for i in {1..${#current_dirs}}; do
+#         if [[ $current_dirs[$i] != $old_dirs[$i] ]]; then
+#             cd $current_dirs[$i]
+#             break
+#         fi
+#     done
+# }
+
+#compdef '_files -g "*.gz *.tgz *.bz2 *.tbz *.zip *.rar *.tar *.lha"' extract_archive

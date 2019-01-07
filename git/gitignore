@@ -1,0 +1,120 @@
+
+
+# Tags      taken from: https://github.com/github/gitignore/blob/master/Global/Tags.gitignore
+# ----------------------------------------------------------------------------------------------
+# Ignore tags created by etags, ctags, gtags (GNU global) and cscope
+TAGS
+!TAGS/
+tags
+!tags/
+.tags
+.tags1
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
+
+# Vim       taken from: https://github.com/github/gitignore/blob/master/Global/vim.gitignore
+# ----------------------------------------------------------------------------------------------
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# SASS
+# ----------------------------------------------------------------------------------------------
+.sass-cache
+
+# Numerous always-ignore extensions
+*.diff
+*.err
+*.orig
+*.log
+*~
+
+# OS or Editor folders
+.DS_Store
+.cache
+
+# Folders to ignore
+.hg
+.svn
+
+# Node.js package manager
+/bower_components
+/node_modules
+/npm-debug.log
+
+# Other stuff
+*.pyc
+/tmp
+
+# Project stuff
+yarn.lock
+package-lock.json
+
+
+# Useful `.gitignore` templates:
+# https://github.com/github/gitignore
+
+# ----------------------------------------------------------------------
+# | Linux                                                              |
+# ----------------------------------------------------------------------
+
+*~
+
+
+# ----------------------------------------------------------------------
+# | Miscellaneous                                                      |
+# ----------------------------------------------------------------------
+
+# Node.js & npm.
+
+node_modules
+npm-debug.log
+
+
+# ----------------------------------------------------------------------
+# | macOS                                                              |
+# ----------------------------------------------------------------------
+# OSX       taken from: https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
+# ----------------------------------------------------------------------------------------------
+# Thumbnails
+._*
+.AppleDouble
+.DS_Store
+.localized
+.LSOverride
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+Icon
+
+
+# ----------------------------------------------------------------------
+# | Vim                                                                |
+# ----------------------------------------------------------------------
+
+%*
+*.sw[a-z]
+*.un~
+.netrwhist
+Session.vim
+
+
+# ----------------------------------------------------------------------
+# | Windows                                                            |
+# ----------------------------------------------------------------------
+# Windows   taken from: https://github.com/github/gitignore/blob/master/Global/Windows.gitignore
+# ----------------------------------------------------------------------------------------------
+# Windows image file caches
+
+Desktop.ini
+ehthumbs.db
+Thumbs.db

@@ -1,0 +1,103 @@
+#!/bin/zsh
+# -*- coding:utf-8 -*-
+###############################################################################
+# .zpath --  My ZSH configuration (feat. Oh-my-zsh)
+#                                        __  __
+#                     ____  ____  ____ _/ /_/ /_
+#                    /_  / / __ \/ __ `/ __/ __ \
+#                     / /_/ /_/ / /_/ / /_/ / / /
+#                    /___/ .___/\__,_/\__/_/ /_/
+#                       /_/
+# zpath - Sets PATH related variables.
+#
+# NOTE: set fpath before compinit
+###############################################################################
+# Automatically remove duplicates from these arrays.
+typeset -gx -U path cdpath fpath manpath
+
+# System $PATH.
+path=(
+  /bin \
+  /sbin \
+  /usr/bin \
+  /usr/sbin \
+  /usr/local/bin \
+  /usr/local/sbin \
+  ##  /usr/X11R6/bin
+  # /usr/ucb            # SunOS
+  # /usr/sww/bin        # SunOS
+)
+# typeset -gx -U path
+# path=( \
+#     /usr/local/bin(N-/) \
+#     ~/bin(N-/) \
+#     # ~/.zplug/bin(N-/) \
+#     # ~/.tmux/bin(N-/) \
+#     "$path[@]" \
+#     )
+
+
+fpath=( \
+   ~/.zsh/Completion(N-/) \
+   ~/.zsh/functions(N-/) \
+   ~/.zsh/plugins/zsh-completions(N-/) \
+   /usr/local/share/zsh/site-functions(N-/) \
+   $fpath \
+   )
+# fpath+=(~/.zsh/functions ~/.zsh/functions/hooks)
+
+# Man pages.
+manpath=(
+  /usr/local/man
+  /usr/man
+)
+
+# OS-specific paths.
+case $OSTYPE in
+  darwin*)
+    # MacTeX binaries.
+    [[ -d /usr/texbin ]] && path=( $path /usr/texbin )
+    [[ -d /Library/TeX/texbin ]] && path=( $path /Library/Tex/texbin )
+    # Apple's X11 binaries.
+    [[ -d /usr/X11R6/bin ]] && path=( $path /usr/X11R6/bin )
+    # Default MacPorts installations.
+    if [[ -d /opt/local ]]; then
+      path=(/opt/local/bin /opt/local/sbin $path )
+      manpath=(/opt/local/share/man $manpath )
+    fi
+    ;;
+esac
+
+# Source local paths.
+if [[ -f ~/.zpath.local ]]; then
+  source ~/.zpath.local
+fi
+
+# Home prefix has highest precedence, thus sourced last.
+path=( ~/bin ${path} )
+manpath=( ~/man ${manpath} )
+if [[ -d ~/.gem && -d ~/.gem/ruby ]]; then
+  foreach dir (~/.gem/ruby/*) { [[ -d $dir/bin ]] && path=( ${dir}/bin ${path} ) }
+fi
+
+# Removes non-existent directories from an array.
+clean-path () {
+  local element
+  local build
+  build=()
+  # Make sure that this works even with variables containing IFS characters,
+  # if you're crazy enough to setopt shwordsplit.
+  eval '
+  foreach element in "$'"$1"'[@]"; do
+      [[ -d "$element" ]] && build=("$build[@]" "$element")
+  done
+  '"$1"'=( "$build[@]" )
+  '
+}
+
+# Finally, clean the path variables.
+clean-path path
+clean-path manpath
+clean-path fpath
+
+# vim: ft=zsh
