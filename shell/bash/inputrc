@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# inputrc
+
+# Make Tab autocomplete regardless of filename case
+# Completion Options
+set page-completions on                  # Page completions more like.
+set completion-ignore-case on            # Ignore case
+set completion-query-items 200           # Show double the number of default completions.
+set match-hidden-files off               # Don't match hidden files
+set show-all-if-ambiguous on             # Enable single tab completion
+set show-all-if-unmodified on            # List immediately, don't bell if ambigous.
+set visible-stats on                     # Show item type like 'ls -F', displays /,*,@ next to name
+set colored-stats on
+
+# List all matches in case multiple possible completions are possible
+set show-all-if-ambiguous on
+
+# Immediately add a trailing slash when autocompleting symlinks to directories
+set mark-symlinked-directories on
+
+# Make TAB cycle through possible completions
+# "\t": menu-complete
+# Make SHIFT-TAB reverse cycle through possible completions
+# "\e[Z": "\e-1\C-i"
+
+# Use the string that has already been typed as the prefix for searching
+# through commands (i.e. more intelligent Up/Down-arrow behavior)
+"\e[B": history-search-forward
+"\e[A": history-search-backward
+
+# Do not autocomplete hidden files unless the pattern explicitly begins with a dot
+set match-hidden-files off
+
+# Show all autocomplete results at once
+set page-completions off
+
+# If there are more than 200 possible completions for a word, ask to show them all
+set completion-query-items 200
+
+# Show extra file information when completing, like `ls -F` does
+set visible-stats on
+
+# Be more intelligent when autocompleting by also looking at the text after
+# the cursor. For example, when the current line is "cd ~/src/mozil", and
+# the cursor is on the "z", pressing Tab will not autocomplete it to "cd
+# ~/src/mozillail", but to "cd ~/src/mozilla". (This is supported by the
+# Readline used by Bash 4.)
+set skip-completed-text on
+
+# Allow UTF-8 input and output, instead of showing stuff like $'\0123\0456'
+set meta-flag on
+set input-meta on
+set output-meta on
+set convert-meta off
+
+$if mode=emacs
+    # Readline specific functions
+    "\e[1~": beginning-of-line           # CTRL + A
+    "\e[4~": end-of-line                 # CTRL + E
+    "\e[5C": forward-word                # Control + Right
+    "\e[5D": backward-word               # Control + Left
+    "\e[3~": delete-char                 # Delete
+    "\e[2~": quoted-insert               # CTRL + v
+    "\e[5~": history-search-backward     # Page Up
+    "\e[6~": history-search-forward      # Page Down
+    #"\t": menu-complete                 # Tab cycles through completions
+
+  # Mappings for Ctrl-left-arrow and Ctrl-right-arrow word moving
+  #"\e[1;5C": forward-word
+  #"\e[1;5D": backward-word
+
+    # If the above prevents Left and Right from working, try this:
+    #"\e[C": forward-char                # Move forward one character.
+    #"\e[D": backward-char               # Move backwards one character.
+$endif
+
+# Avoid binding ^J, ^M,  ^C, ^?, ^S, ^Q, etc.
+$if mode=vi
+    set keymap vi-command
+    "gg": beginning-of-history
+    "G": end-of-history
+    "k": history-search-backward
+    "j": history-search-forward
+    "?": reverse-search-history
+    "/": forward-search-history
+
+    set keymap vi-insert
+    "\C-l": clear-screen
+    "\C-w": backward-kill-word
+    "\C-a": beginning-of-line
+    "\C-e": end-of-line
+$endif
+
+# Use Alt/Meta + Delete to delete the preceding word
+"\e[3;3~": kill-word
+
+## enable Alt-arrows
+"\e[1;5D": backward-word ### Alt left
+"\e[1;5C": forward-word ### Alt right

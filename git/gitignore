@@ -1,7 +1,8 @@
-
-
-# Tags      taken from: https://github.com/github/gitignore/blob/master/Global/Tags.gitignore
-# ----------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# |                                  TAG                                       |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/Tags.gitignore
+# ------------------------------------------------------------------------------
 # Ignore tags created by etags, ctags, gtags (GNU global) and cscope
 TAGS
 !TAGS/
@@ -17,34 +18,12 @@ cscope.files
 cscope.out
 cscope.in.out
 cscope.po.out
-
-# Vim       taken from: https://github.com/github/gitignore/blob/master/Global/vim.gitignore
-# ----------------------------------------------------------------------------------------------
-[._]*.s[a-w][a-z]
-[._]s[a-w][a-z]
-*.un~
-Session.vim
-.netrwhist
-*~
-
-# SASS
-# ----------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# |                                 SASS                                       |
+# ------------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------------
 .sass-cache
-
-# Numerous always-ignore extensions
-*.diff
-*.err
-*.orig
-*.log
-*~
-
-# OS or Editor folders
-.DS_Store
-.cache
-
-# Folders to ignore
-.hg
-.svn
 
 # Node.js package manager
 /bower_components
@@ -53,8 +32,8 @@ Session.vim
 
 # Other stuff
 *.pyc
-/tmp
 
+/tmp
 # Project stuff
 yarn.lock
 package-lock.json
@@ -63,44 +42,76 @@ package-lock.json
 # Useful `.gitignore` templates:
 # https://github.com/github/gitignore
 
-# ----------------------------------------------------------------------
-# | Linux                                                              |
-# ----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# |                               Linux                                        |
+# ------------------------------------------------------------------------------
 
 *~
 
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
 
-# ----------------------------------------------------------------------
-# | Miscellaneous                                                      |
-# ----------------------------------------------------------------------
+# KDE directory preferences
+.directory
 
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+# ------------------------------------------------------------------------------
+# |                            Miscellaneous                                   |
+# ------------------------------------------------------------------------------
 # Node.js & npm.
 
 node_modules
 npm-debug.log
 
-
-# ----------------------------------------------------------------------
-# | macOS                                                              |
-# ----------------------------------------------------------------------
-# OSX       taken from: https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
-# ----------------------------------------------------------------------------------------------
-# Thumbnails
-._*
-.AppleDouble
+# ------------------------------------------------------------------------------
+# |                                   macOS                                    |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
+# ------------------------------------------------------------------------------
+# General
 .DS_Store
-.localized
+.AppleDouble
 .LSOverride
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
+
+# Icon must end with two \r
 Icon
 
 
-# ----------------------------------------------------------------------
-# | Vim                                                                |
-# ----------------------------------------------------------------------
+# Thumbnails
+._*
 
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ------------------------------------------------------------------------------
+# |                                   Vim                                      |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/vim.gitignore
+# ------------------------------------------------------------------------------
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
 %*
 *.sw[a-z]
 *.un~
@@ -108,13 +119,244 @@ Icon
 Session.vim
 
 
-# ----------------------------------------------------------------------
-# | Windows                                                            |
-# ----------------------------------------------------------------------
-# Windows   taken from: https://github.com/github/gitignore/blob/master/Global/Windows.gitignore
-# ----------------------------------------------------------------------------------------------
-# Windows image file caches
-
-Desktop.ini
-ehthumbs.db
+# ------------------------------------------------------------------------------
+# |                                Windows                                     |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/Windows.gitignore
+# ------------------------------------------------------------------------------
+# Windows thumbnail cache files
 Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+## .gitignore for eclipse
+# ------------------------------------------------------------------------------
+# |                                Eclipse                                     |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore
+# ------------------------------------------------------------------------------
+.metadata
+bin/
+tmp/
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.worksheet
+.classpath
+/.classpath
+/.launch
+
+/ivy*
+/eclipse
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# PyDev specific (Python IDE for Eclipse)
+*.pydevproject
+
+# CDT-specific (C/C++ Development Tooling)
+.cproject
+
+# CDT- autotools
+.autotools
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific (PHP Development Tools)
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# Tern plugin
+.tern-project
+
+# TeXlipse plugin
+.texlipse
+
+# STS (Spring Tool Suite)
+.springBeans
+
+# Code Recommenders
+.recommenders/
+
+# Annotation Processing
+.apt_generated/
+
+# Scala IDE specific (Scala & Java development for Eclipse)
+.cache-main
+.scala_dependencies
+
+# older plugin install locations
+/plugins
+/web-app/plugins
+/web-app/WEB-INF/classes
+
+# "temporary" build files
+target/
+out/
+build/
+
+
+## .gitignore for intellij
+## .gitignore for eclipse
+# ------------------------------------------------------------------------------
+# |                                Intellij                                    |
+# ------------------------------------------------------------------------------
+# from:
+# ------------------------------------------------------------------------------
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# ------------------------------------------------------------------------------
+# |                                   LOGS                                     |
+# ------------------------------------------------------------------------------
+# from:
+# ------------------------------------------------------------------------------
+/stacktrace.log
+/test/reports
+/logs
+*.log
+*.log.*
+# ------------------------------------------------------------------------------
+# |                                   TAR                                      |
+# ------------------------------------------------------------------------------
+# from:
+# ------------------------------------------------------------------------------
+# Package Files #
+*.jar
+*.war
+*.ear
+# project release file
+/*.war
+
+# plugin release file
+/*.zip
+/*.zip.sha1
+
+# ------------------------------------------------------------------------------
+# |                                   CVS                                      |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/CVS.gitignore
+# ------------------------------------------------------------------------------
+# Folders to ignore
+.hg
+.svn
+/CVS/*
+**/CVS/*
+.cvsignore
+*/.cvsignore
+# ------------------------------------------------------------------------------
+# |                                   CACHE                                    |
+# ------------------------------------------------------------------------------
+# from:
+# ------------------------------------------------------------------------------
+*cache
+
+# Dropbox settings and caches
+.dropbox
+.dropbox.attr
+.dropbox.cache
+# ------------------------------------------------------------------------------
+# |                                   Emacs                                    |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/Emacs.gitignore
+# ------------------------------------------------------------------------------
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Org-mode
+.org-id-locations
+*_archive
+
+# flymake-mode
+*_flymake.*
+
+# eshell files
+/eshell/history
+/eshell/lastdir
+
+# elpa packages
+/elpa/
+
+# reftex files
+*.rel
+
+# AUCTeX auto folder
+/auto/
+
+# cask packages
+.cask/
+dist/
+
+# Flycheck
+flycheck_*.el
+
+# server auth directory
+/server/
+
+# projectiles files
+.projectile
+
+# directory configuration
+.dir-locals.el
+
+# network security
+/network-security.data
+
+# ------------------------------------------------------------------------------
+# |                                   FILES                                     |
+# ------------------------------------------------------------------------------
+# from: https://github.com/github/gitignore/blob/master/Global/Diff.gitignore
+# ------------------------------------------------------------------------------
+# Numerous always-ignore extensions
+.patch
+*.diff
+*.err
+*.orig
+*.log
+*.tmp
+*.bak
+*.swp
+*~
