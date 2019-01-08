@@ -19,7 +19,7 @@
 #
 ###############################################################################
 
-cd "$(dirname "${BASH_SOURCE[0]}")" && . "../utils.sh"
+cd "$(dirname "${BASH_SOURCE[0]}")" && . "../install/init/utils.sh"
 DOTFILES_ROOT="${HOME}/.dotfiles"
 #declare -r FONT_DIRECTORY="$CODE_DIRECTORY/fonts"
 

@@ -1,3 +1,6 @@
 [submodule "emacs/spacemacs.d"]
 	path = emacs/spacemacs.d
 	url = https://github.com/seirhsiao/spacemacs.d.git
+[submodule "hosts"]
+	path = hosts
+	url = https://github.com/googlehosts/hosts.git
